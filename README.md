@@ -36,7 +36,7 @@ A estrutura do arquivo principal é bastante simples. Você só precisa indicar 
   kind: "completo",
   me: "KLEER",
   last_page: true,
-  database: "data/lattes.toml",
+  database: "seu-caminho-para-o-arquivo/arquivo.toml",
   date: datetime(year: 2022, month: 04, day: 07)
 )    
 ```
