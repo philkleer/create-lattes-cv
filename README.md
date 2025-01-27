@@ -23,7 +23,7 @@ python3 helper.py caminho-para-o-seu-arquivo-xml
 
 Isso criará o arquivo `meu-arquivo.toml`, que você poderá usar nos documentos do Typst.
 
-### Creating the PDF 
+### Criando o PDF 
 
 A estrutura do arquivo principal é bastante simples. Você só precisa indicar qual versão do currículo deseja no argumento `kind`: `resumido`, `ampliado` ou `completo`. Dependendo da sua escolha, você utiliza a função específica:
 
@@ -41,6 +41,15 @@ A estrutura do arquivo principal é bastante simples. Você só precisa indicar 
 )    
 ```
 
+#### Uso de Typst local
+
+Antes de usar, você precisa instalar ou fazer update para Typst 0.12. Como você poderia instalar é descrevido [aqui](https://github.com/typst/typst).
+
+#### Uso no editor online de Typst
+Você poderia usar o editor online de [Typst](https://typst.app) para criar um projeto. Você poderia copiar esse projeto que já tem todos os arquivos (sem o arquivo criado do Lattes): [Link](https://typst.app/project/rDHeKkEoT9UuHDnnH93mQq)
+
+Antes de executar, você somente precisa fazer o upload do arquivo transformado para `.toml` do Lattes. 
+
 ### Uso ou melhorias das funções
 
 Esta é uma primeira abordagem simples para uma solução, e eu ainda não estruturei tudo completamente. O objetivo principal, até o momento, é ter funções para cada área que são chamadas se a área específica estiver presente nos dados XML/TOML.
@@ -57,7 +66,7 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 
 🎬 : finalizado
 
-| Area | Coded? | Part of completo | Part of ampliado | Part of resumido | 
+| Área | Coded? | Parte de tipo *completo* | Parte de tipo *ampliado* | Parte de tipo *resumido* | 
 | :---------------- | :--:| :--:| :--:| :--:|
 | **Identificação** |  🎬 | ✅ | ✅ | ✅ |
 | **Idiomas** | 🎬 | ✅ | ✅ | ✅ |
