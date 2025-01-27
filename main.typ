@@ -10,7 +10,7 @@
 // - database: link para o arquivo de toml.
 // - datetime: a data atual
 #show: lattes-cv.with(
-  kind: "resumido",
+  kind: "completo",
   me: "KLEER",
   last_page: true,
   database: "data/lattes.toml",

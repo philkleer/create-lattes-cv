@@ -2107,20 +2107,6 @@
 // Argumentos
 //  - dados_educacao_ct: subset para invoção - educação e popularização
 #let create-education-ct(dados_educacao_ct) = {
-    // criar banco de dados
-    // educacao e popularizacao de C&T
-    // let eventos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA
-
-    // // criar banco de dados de apresentações
-    // let congressos = eventos.APRESENTACAO-DE-TRABALHO
-
-    // // ordenar por ano 
-    // let congressos = congressos.sorted(key: (item) => (item.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO.ANO, item.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO.TITULO))
-
-    // let congressos = congressos.filter(
-    //     entry => entry.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO.FLAG-DIVULGACAO-CIENTIFICA == "SIM"
-    // )
-
     if dados_educacao_ct.len() > 0 {
         // criar cabeçalho 
         // TODO: até agora somente essa categoria, com mais categorias precisa mudar pra cima
