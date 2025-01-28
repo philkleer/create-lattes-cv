@@ -1,9 +1,15 @@
-trials/
-references/
-data/lattes.toml
-data/lattes.xml
+
+
 *.DS_Store
 *.pdf
 
+# remove my personal files from sync
+data/lattes.toml
+data/lattes.xml
+
 # para testes
 test.typ
+trials/
+
+# removed folder with example output
+references/
