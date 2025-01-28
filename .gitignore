@@ -1,5 +1,7 @@
 trials/
 references/
+data/lattes.toml
+data/lattes.xml
 *.DS_Store
 *.pdf
 
