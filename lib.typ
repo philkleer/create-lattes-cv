@@ -130,14 +130,11 @@
 
         create-education-ct(details, me)
     }
-    
+
     // Resumo de produções na última página
     if last_page == true {
         pagebreak()
 
         create-last-page(details, kind)
     } 
-}
-
-// // 
-        
+}        
