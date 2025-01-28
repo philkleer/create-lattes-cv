@@ -79,15 +79,22 @@
 
     // Begin Content
     create-identification(details)  
-
-    create-languages(details)
     
-    create-prices(details)
+    if kind != "resumido" {
+        // Área de idiomas
+        create-languages(details)
 
+        // Área de prêmios e títulos
+        create-prices(details)
+    }    
+
+    // Área de formação
     create-education(details, kind)
     
+    // Área de formação complementar
     create-advanced-training(details)
 
+    // Área de atuação
     create-experience(details)
     
     if kind == "completo" {
@@ -96,24 +103,31 @@
 
     create-revisor(details)
 
+    // Área de conhecimento
     if kind != "resumido" {
         create-areas-work(details)
     }
 
+    // Produção bibliográfica
     create-bibliography(details, me, kind)
 
+    // Área de inovação
     if kind == "completo" {
         create-innovations(details)
     }
     
+    // Área de orientações e supervisões
     create-supervisions(details)
 
     if kind == "completo" {
+        // área de eventos
         create-events(details)
-    
+
+        // área de bancas
         create-examinations(details, me)
     }
     
+    // Resumo de produções na última página
     if last_page == true {
         pagebreak()
 
