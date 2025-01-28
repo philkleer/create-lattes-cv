@@ -2801,7 +2801,7 @@
                 let titulo = subset.TITULO
 
                 // criando texto
-                descricao_content = [#tipo em #strong(evento), #ano (natureza). #titulo]
+                descricao_content = [#tipo em #strong(evento), #ano (#natureza). #titulo]
 
                 // publicando content
                 create-cols([*#i.*], [#descricao_content], "enum")
