@@ -56,6 +56,10 @@ Esta é uma primeira abordagem simples para uma solução, e eu ainda não estru
 
 As variáveis locais (em funções, loops, etc.) têm nomes em português. As variáveis globais têm nomes em inglês (global refere-se ao uso em `lib.typ`).
 
+### Como participar? (pull request)
+
+Se você quiser participar no projeto, você pode gerar um *fork* e depois um *pull request* para adicionar seu código. 
+
 ### O que já está incluído
 
 Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas categórias no meu, enfim eu não sei quais categórias são incluídas. Se você tiver uma dessas categórias marcada com 🧐 no seu currículo, você poderia alterar a tabela. 
