@@ -1,74 +1,21 @@
 #import "@preview/datify:0.1.3": *
 #import "utils.typ": *
 
-// Function _create-cols: setting style and table
+// Funcção lattes_cv: criar o PDF com os dados de lattes
 // Arguments:
-// - left: the content to be placed in the first column (Type: Any)
-// - right: the content to be placed in the second column (Type: Any)
-// - ..args: additional named arguments for customization
-
-#let _create-cols(left, right, type, ..args) = {
-  
-  // Set the block style with no spacing below
-  set block(below: 0pt)
-  let col_width = (0.85fr, 5fr)
-  if type == "small" {
-    col_width = (0.87fr, 5fr)
-  } else if type == "wide" {
-    col_width = (1.1fr, 4fr)
-  } else if type == "enum" {
-    col_width = (0.4fr, 5fr)
-  } else if type == "lastpage" {
-    col_width = (5fr, 0.4fr)
-  }
-
-  // Create a table with specified column widths and no border strokes
-  table(
-    columns: col_width, // Set column widths
-    stroke: none, // No border strokes
-    
-    // Spread any named arguments
-    ..args.named(),
-    
-    // Insert the left and right content into the table
-    left,
-    right,
-  )
-}
-
-// Function create-cols: Putting input into the table
-// Arguments:
-// - left-side: the content to be aligned to the right (Type: Any)
-// - right-side: the content to be formatted as a paragraph with justified alignment (Type: Any)
-// - type: string which type: small, wide, or enum
-#let create-cols(left-side, right-side, type) = {
-  
-  // Call the _cv-cols with aligned left-side and justified right-side parameters
-  if type == "lastpage" {
-    _create-cols(
-        align(right, left-side),
-        par(right-side, justify:false),
-        type
-    )
-  } else {
-    _create-cols(
-        // Align the left-side content to the right
-        align(right, left-side),
-        // Format the right-side content as a paragraph with justified alignment
-        align(left, par(right-side, justify: true)),
-        type
-        )
-  }
-}
-
-
+// - database: o arquivo de TOML com os dados de Lattes (string)
+// - kind: o tipo de currículo Lattes (string)
+// - me: o nome para destacar nas citações (string)
+// - data: a data de currículo
+// - last_page: resumo de produção no final (boolean)
+// - subtitle: para a página inicial 
 #let lattes-cv(
-  me: str,
-  last_page: true,
-  kind: "completo", 
-  subtitle: "Curriculum Vitae",
-  date: none,
   database: "output.toml",
+  kind: "completo", 
+  me: str,
+  date: none,
+  last_page: true,
+  subtitle: "Curriculum Vitae",
   body,
 ) = {
     // define details:
