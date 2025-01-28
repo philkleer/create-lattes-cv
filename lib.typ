@@ -1,20 +1,20 @@
 #import "@preview/datify:0.1.3": *
 #import "utils.typ": *
 
-// Funcção lattes_cv: criar o PDF com os dados de lattes
+// Função lattes_cv: criar o PDF com os dados de lattes
 // Arguments:
 // - database: o arquivo de TOML com os dados de Lattes (string)
 // - kind: o tipo de currículo Lattes (string)
 // - me: o nome para destacar nas citações (string)
-// - data: a data de currículo
 // - last_page: resumo de produção no final (boolean)
+// - data: a data de currículo (datetime)
 // - subtitle: para a página inicial 
 #let lattes-cv(
   database: "output.toml",
   kind: "completo", 
   me: str,
-  date: none,
   last_page: true,
+  date: datetime.today(),
   subtitle: "Curriculum Vitae",
   body,
 ) = {
@@ -88,7 +88,7 @@
     
     create-advanced-training(details)
 
-    create-atuacao(details)
+    create-experience(details)
     
     if kind == "completo" {
         create-projects(details)
@@ -97,7 +97,7 @@
     create-revisor(details)
 
     if kind != "resumido" {
-        create-areas-atuacao(details)
+        create-areas-work(details)
     }
 
     create-bibliography(details, me, kind)
