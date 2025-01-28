@@ -1242,10 +1242,10 @@
     }
 }
 
-// Função create-revisor(): Cria áreas de revisor (periódico, assessora, fomento)
+// Função create-reviewer(): Cria áreas de revisor (periódico, assessora, fomento)
 // Argumento:
 //  - detalhes: o banco de dados de Lattes (TOML File)
-#let create-revisor(detalhes) = {
+#let create-reviewer(detalhes) = {
 
     // criando banco de dados
     let atuacao = detalhes.DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL

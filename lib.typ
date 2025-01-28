@@ -101,7 +101,7 @@
         create-projects(details)
     }    
 
-    create-revisor(details)
+    create-reviewer(details)
 
     // Área de conhecimento
     if kind != "resumido" {
