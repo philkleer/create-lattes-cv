@@ -115,7 +115,7 @@
     if kind == "completo" {
         create-innovations(details)
 
-        create-education-ct(details)
+        create-education-ct(details, me)
     }
     
     // Área de orientações e supervisões
