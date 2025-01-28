@@ -118,7 +118,7 @@
 #let replace-quotes(texto) = {
     let novo_texto = str
     if type(texto) != str {
-        [O input precisa ser _string_]
+        panic("O input precisa ser string!")
     } else {
         novo_texto = texto.replace("&quot;", "\"")
     }
