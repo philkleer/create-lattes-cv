@@ -7,13 +7,12 @@
 // imports
 #import "@preview/datify:0.1.3": *
 
-// Função _create-cols: define estilo e tabela
+// Função _create-cols(): define estilo e tabela
 // Argumentos:
 // - left: o conteúdo a ser colocado na primeira coluna (Tipo: Qualquer)
 // - right: o conteúdo a ser colocado na segunda coluna (Tipo: Qualquer)
 // - type: escolha a separação das colunas (tipos: "small", "wide", "enum", "lastpage")
 // - ..args: argumentos nomeados adicionais para personalização
-
 #let _create-cols(left, right, type, ..args) = {
   
   // Defina o estilo do bloco sem espaçamento abaixo
@@ -43,7 +42,7 @@
   )
 }
 
-// Função create-cols: Colocando o input na tabela
+// Função create-cols(): Coloca o input na tabela
 // Argumentos:
 // - left-side: o conteúdo a ser alinhado à esquerda (Tipo: Qualquer)
 // - right-side: o conteúdo a ser formatado como um parágrafo com alinhamento justificado (Tipo: Qualquer)
@@ -68,16 +67,15 @@
   }
 }
 
-// Formatar os nomes de autores/membros etc.
-// Formata os nomes no estilo de ABNT
-// argumentos:
+// Função format_authors(): formata os nomes de autores/membros etc. no estilo de ABNT
+// Argumentos:
 //  - autores: array de autores
 //  - eu: indicaco de nome para destacar
 #let format_authors(autores, eu) = {
-    // criar array para pegar os nomes
+    // criando array para pegar os nomes
     let formatted_authors = ()
 
-    // criar formato de ABNT para cada autor
+    // criando formato de ABNT para cada autor
     for autor in autores {
         // caso so uma pessoa
         if type(autor) == dictionary {
@@ -95,7 +93,7 @@
         } 
     }
     
-    // criar string para destacar o nome
+    // criando string para destacar o nome
     formatted_authors = formatted_authors.join("; ")
     
     // destacar o nome
@@ -115,22 +113,20 @@
 }
 
 
-// TODO: NEW FUNCTIONS
-// próxima funcção é de livros!
-// Criar área de identificação
-// Argumentos
+// Função create-identification(): Cria área de identificação
+// Argumentos:
 // - detalhes: o banco de dados de Lattes (TOML)
 #let create-identification(detalhes) = {
 
     let identificacao = detalhes.DADOS-GERAIS
 
-    // criar variáveis
+    // criando variáveis
     let author = identificacao.NOME-COMPLETO
     
-    // criar filiação
+    // criando filiação
     let filiacao = content
     
-    // criar content
+    // criando content
     if identificacao.NOME-DO-PAI != "" {
         if identificacao.NOME-DA-MAE != "" {
             filiacao = [#identificacao.NOME-DA-MAE, #identificacao.NOME-DO-PAI]
@@ -143,7 +139,7 @@
         }
     }
 
-    // criar nascimento
+    // criando nascimento
     let birth = identificacao.DATA-NASCIMENTO
     let date_birth = datetime(
         year: int(birth.slice(4, 8)), 
@@ -151,7 +147,7 @@
         day: int(birth.slice(0, 2))
     )
 
-    // criar endereço (depende de FLAG)
+    // criando endereço (depende de FLAG)
     let endereco = []
     if identificacao.ENDERECO.FLAG-DE-PREFERENCIA == "ENDERECO_RESIDENCIAL" {
         endereco = [
@@ -186,31 +182,31 @@
     let lattes_id = detalhes.NUMERO-IDENTIFICADOR
     let orcid_id = identificacao.ORCID-ID
 
-    // criar content
+    // criando content
     [= Identificação]
 
-    // criar nome
+    // criando nome
     _create-cols([*Nome*], identificacao.NOME-COMPLETO, "small")
     
-    // criar filiação
+    // criando filiação
     if filiacao != content {
         _create-cols([*Filiação*], filiacao, "small")
     }
      
-    // criar nascimento
+    // criando nascimento
     _create-cols([*Nascimento*], custom-date-format(date_birth, "DD de Month de YYYY", "pt"), "small")
     
-    // criar ID Lattes and ID ORCID
+    // criando ID Lattes and ID ORCID
     _create-cols([*Lattes ID*], link("http://lattes.cnpq.br/" + lattes_id)[#lattes_id], "small")
     
     if orcid_id != "" {
         _create-cols([*Orcid ID*], link("https://orcid.org/" + orcid_id.slice(18))[#orcid_id.slice(18)], "small")
     }
     
-    // criar citações
+    // criando citações
     _create-cols([*Nome em citações*], detalhes.DADOS-GERAIS.NOME-EM-CITACOES-BIBLIOGRAFICAS, "small")
     
-    // criar endereço, telefone e e-mail
+    // criando endereço, telefone e e-mail
     if endereco != [] {
         _create-cols([*Endereço*], endereco, "small")
     }
@@ -229,15 +225,15 @@
     line(length: 100%)
 }
 
-// Criar área de idiomas
-// Argumentos
+// Função create-languages(): Cria área de idiomas
+// Argumentos:
 // - detalhes: o banco de dados de Lattes (TOML)
 #let create-languages(detalhes) = {
 
-    // criar banco de dados
+    // criando banco de dados
     let languages = detalhes.DADOS-GERAIS.IDIOMAS.IDIOMA
 
-    // criar ordem: compreensão > falar > escrita > leitura > nome da língua
+    // criando ordem: compreensão > falar > escrita > leitura > nome da língua
     languages = languages.sorted(key: (item) => (item.PROFICIENCIA-DE-COMPREENSAO, item.PROFICIENCIA-DE-FALA, item.PROFICIENCIA-DE-ESCRITA, item.PROFICIENCIA-DE-LEITURA, item.DESCRICAO-DO-IDIOMA))
 
     // loop pelas entradas nas idiomas
@@ -256,7 +252,7 @@
             let leitura = languages.at(i).PROFICIENCIA-DE-LEITURA
             let descricao_content = [compreende #compreensao, fala #falar, escreve #escrita, le #leitura]
 
-            // publicar conteúdo
+            // publicando content
             _create-cols([*#lang_content*], [#descricao_content], "small")
 
             i += 1
@@ -267,11 +263,11 @@
     line(length: 100%)
 }
 
-// Criar área de prêmios e títulos
-// Argumentos
+// Função create-prices(): Cria área de prêmios e títulos
+// Argumentos:
 // - detalhes: o banco de dados de Lattes (TOML)
 #let create-prices(detalhes) = {
-    // criar banco de dados
+    // criando banco de dados
     let premios = detalhes.DADOS-GERAIS.PREMIOS-TITULOS.PREMIO-TITULO
 
     let i = premios.len() - 1
@@ -285,7 +281,7 @@
 
             let descricao_content = [#premios.at(i).NOME-DO-PREMIO-OU-TITULO, #emph(premios.at(i).NOME-DA-ENTIDADE-PROMOTORA)]
 
-            // publicar conteúdo
+            // publicando content
             create-cols([*#ano_content*], [#descricao_content], "enum")
 
             // diminuir número
@@ -297,8 +293,8 @@
     line(length: 100%)
 }
 
-// Criar área de formação complementar
-// Argumentos
+// Função create-education(): Cria área de formação complementar
+// Argumentos:
 // - detalhes: o banco de dados de Lattes (TOML)
 // - tipo_lattes: tipo de currículo Lattes
 #let create-education(detalhes, tipo_lattes) = {
@@ -309,7 +305,7 @@
 
         // loop pelas keys em dictionary e imprimir todas vagas
         for key in formacao.keys().rev() {
-            // criar banco de dados
+            // criando banco de dados
             let subset = formacao.at(key)
             
             // initialize variables
@@ -332,14 +328,14 @@
 
             tempo_content = [#subset.ANO-DE-INICIO - #subset.ANO-DE-CONCLUSAO]
             
-            // criar título
+            // criando título
             if "TITULO-DO-TRABALHO-DE-CONCLUSAO-DE-CURSO" in subset.keys() {
                 titulo = subset.TITULO-DO-TRABALHO-DE-CONCLUSAO-DE-CURSO 
             } else if "TITULO-DA-DISSERTACAO-TESE" in subset.keys() {
                 titulo = subset.TITULO-DA-DISSERTACAO-TESE
             }
 
-            // criar orientadres
+            // criando orientadres
             if "NOME-DO-CO-ORIENTADOR" in subset.keys() {
                 if subset.NOME-DO-CO-ORIENTADOR !="" {
                     orientador = subset.NOME-COMPLETO-DO-ORIENTADOR
@@ -353,7 +349,7 @@
                 orientador = subset.NOME-COMPLETO-DO-ORIENTADOR
             }
 
-            // criar áreas de conhecimento
+            // criando áreas de conhecimento
             if "AREAS-DO-CONHECIMENTO" in subset.keys() {
                 let areas = subset.at("AREAS-DO-CONHECIMENTO")
 
@@ -381,7 +377,7 @@
                 }
             }
 
-            // criar content
+            // criando content
             let estudo = [#key.slice(0, 1)#lower(key.slice(1)) em #subset.NOME-CURSO, #emph(subset.NOME-INSTITUICAO)]
             // caso tem todas informações
             if orientador != str and coorientador != str {
@@ -405,14 +401,14 @@
                     Título: #titulo#linebreak()
                 ]
             }
-            // criar conteúdo depende do tipo de lattes
+            // criando conteúdo depende do tipo de lattes
             if tipo_lattes == "completo" {
                 if conhecimento != content {
                     descricao_content = [#descricao_content#linebreak()#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
                 }
             } 
 
-            // publicar conteúdo
+            // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "small")
         }
 
@@ -422,14 +418,14 @@
     } 
 }
 
-// Criar área de formação complementar
-// Argumentos
+// Função create-advanced-training: Cria área de formação complementar
+// Argumento:
 // - detalhes: o banco de dados de Lattes (TOML)
 #let create-advanced-training(detalhes) = {
     if "DADOS-COMPLEMENTARES" in detalhes {
         if "FORMACAO-COMPLEMENTAR" in detalhes.DADOS-COMPLEMENTARES{
         
-            // criar banco de dados
+            // criando banco de dados
             let complementar = detalhes.DADOS-COMPLEMENTARES.FORMACAO-COMPLEMENTAR
 
             if complementar.len() > 0 {
@@ -452,6 +448,7 @@
                             #entrada.NOME-CURSO (Carga horária: #entrada.CARGA-HORARIA), #emph(entrada.NOME-INSTITUICAO)
                         ]
 
+                        // publicando content
                         create-cols([*#tempo_content*], [#descricao_content], "small")
                     }
                 }
@@ -463,23 +460,23 @@
     line(length: 100%)
 }
 
-// criar vínculos (subárea Atuação)
-// Argumentos
+// Função create-positions(): cria vínculos (subárea Atuação, usado em create-experience())
+// Argumento:
 //  - dados_vagas: o banco de dados filtrado para vagas
 #let create-positions(dados_vagas) = {
     
     // depdende de informações na entrada é dictionary (1) ou array (>1)
     if type(dados_vagas) == array {
         
-        // criar banco de dados em ordem
+        // criando banco de dados em ordem
         let subset = dados_vagas.sorted(key: (item) => (item.ANO-INICIO, item.MES-INICIO, item.ANO-FIM, item.MES-FIM))
 
-        // criar toda entrada
+        // criando toda entrada
         for position in subset.rev() {
             
-            // criar variáveis
+            // criando variáveis
             let tempo_content
-            // criar tempo
+            // criando tempo
             if position.MES-FIM == "" {
                 if position.ANO-FIM == "" {
                     tempo_content = [#position.MES-INICIO/#position.ANO-INICIO - atual]
@@ -493,7 +490,7 @@
             let horas = position.CARGA-HORARIA-SEMANAL
             let informations = position.OUTRAS-INFORMACOES
 
-            // criar content depende das informações dados
+            // criando content depende das informações dados
             let descricao_content
             if enquadramento != "" and horas != "" and informations != "" {
                 // caso tudo é dado
@@ -517,14 +514,15 @@
                 ]
             }
 
+            // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "wide")
         }
     // caso somente uma entrada
     } else if type(dados_vagas) == dictionary {
-        // criar variáveis
+        // criando variáveis
         let tempo_content = []
         
-        // criar tempo
+        // criando tempo
         if dados_vagas.MES-FIM == "" {
             if dados_vagas.ANO-FIM == "" {
                 tempo_content = [#dados_vagas.MES-INICIO/#dados_vagas.ANO-INICIO - atual]
@@ -533,13 +531,13 @@
             tempo_content = [#dados_vagas.MES-INICIO/#dados_vagas.ANO-INICIO - #dados_vagas.MES-FIM/#dados_vagas.ANO-FIM]
         }
 
-        // criar outras variáveis
+        // criando outras variáveis
         let vinculo = [#dados_vagas.TIPO-DE-VINCULO.slice(0,1) #lower(dados_vagas.TIPO-DE-VINCULO.slice(1))]
         let enquadramento = dados_vagas.OUTRO-ENQUADRAMENTO-FUNCIONAL-INFORMADO
         let horas = dados_vagas.CARGA-HORARIA-SEMANAL
         let informations = dados_vagas.OUTRAS-INFORMACOES
 
-        // criar content
+        // criando content
         let descricao_content = []
         if enquadramento != "" and horas != "" and informations != "" {
             // case all three are given
@@ -563,12 +561,13 @@
             ]
         }
 
+        // publicando content
         create-cols([*#tempo_content*], [#descricao_content], "wide")
     }
 }
 
-// criar cursos de ensino (subárea Atuação)
-// Argumentos:
+// Função create-teaching: cria cursos de ensino (subárea Atuação, usado em create-experience())
+// Argumento:
 //  - dados_ensino: o banco de dados filtrado para vagas
 #let create-teaching(dados_ensino) = {
     [== Atividades (Ensino) <ensino_atuacao>]
@@ -577,18 +576,18 @@
         
     } else if type(dados_ensino) == array {
         for curso in dados_ensino {
-            // criar variáveis
+            // criando variáveis
             let disciplinas_text = str
             let tempo_content = []
 
-            // criar tempo_content
+            // criando tempo_content
             if curso.FLAG-PERIODO == "ATUAL" {
                 tempo_content = [#curso.MES-INICIO/#curso.ANO-INICIO - atual]
             } else {
                 tempo_content = [#curso.MES-INICIO/#curso.ANO-INICIO - #curso.MES-FIM/#curso.ANO-FIM]
             }
             
-            // criar nível
+            // criando nível
             let nivel = str(curso.TIPO-ENSINO.slice(0, 1) + lower(curso.TIPO-ENSINO.slice(1)))
 
             // corrigir nível
@@ -614,16 +613,17 @@
                 
             let descricao_content = [#nivel, #curso.NOME-CURSO #linebreak()#text(rgb("B2B2B2"), size: 0.85em, disciplinas_text)]
 
+            // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "wide")
         }
     }
 }
 
-// criar commissões (subárea Atuação)
-// Argumentos:
+// Função create-comissions: cria commissões (subárea Atuação, usado em create-experience())
+// Argumento:
 //  - dados_comissoes: o banco de dados filtrado para vagas
 #let create-commissions(dados_comissoes) = {
-    // criar variáveis
+    // criando variáveis
     let tempo_content = []
     let descricao_content = []
     
@@ -632,7 +632,7 @@
         if "ATIVIDADES-DE-CONSELHO-COMISSAO-E-CONSULTORIA"in dados_comissoes.keys() {
             [== Atividades (Comissões) <comissoes_atuacao>]
             
-            // criar variaveis
+            // criando variaveis
             let tempo_content = []
             if dados_comissoes.FLAG-PERIODO == "ATUAL" {
                 tempo_content = [#dados_comissoes.MES-INICIO/#dados_comissoes.ANO-INICIO - atual]
@@ -644,6 +644,7 @@
                 #dados_comissoes.ESPECIFICACAO, #emph(dados_comissoes.NOME-ORGAO)
             ]
             
+            // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "wide")
         }
     // caso: mais de uma entrada
@@ -661,17 +662,18 @@
                 #posicao.ESPECIFICACAO, #emph(posicao.NOME-ORGAO)
             ]
             
+            // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "wide")
         }
     }
 }
 
-// criar atuação profissional 
-// Argumentos
+// Função create-experience(): cria atuação profissional es subáreas
+// Argumento:
 // - detalhes: o banco de dados de Lattes (TOML File)
-#let create-atuacao(detalhes) = {
+#let create-experience(detalhes) = {
 
-    // criar banco de dados
+    // criando banco de dados
     let atuacao = detalhes.DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL
 
     let atuacao_filtered = atuacao.filter(
@@ -683,7 +685,7 @@
         // loop para cada entrada
         for entrada in atuacao {
 
-            // criar vínculos
+            // criando vínculos
             // ao mínimo tem um vínculo
             let vinculos = ()
             if entrada.SEQUENCIA-IMPORTANCIA != "" {
@@ -696,7 +698,7 @@
                 linebreak()
             }
 
-            // criar comissoes
+            // criando comissoes
             let comissoes_atuacao = ()
             
             if "ATIVIDADES-DE-CONSELHO-COMISSAO-E-CONSULTORIA" in entrada.keys() {
@@ -712,7 +714,7 @@
                 linebreak()
             }
             
-            // Criar ensino
+            // criando ensino
             let ensino = ()
 
             if "ATIVIDADES-DE-ENSINO" in entrada.keys() {
@@ -735,17 +737,17 @@
     line(length: 100%)
 }
 
-// Criar lista de projetos de pesquisa e ensino
-// Argumentos:
+// Função create-projects(): Cria lista de projetos de pesquisa e ensino (só "completo")
+// Argumento:
 //  - detalhes: o banco de dados de Lattes (TOML File)
 #let create-projects(detalhes) = {
-    // criar bancos básicos
+    // criando bancos básicos
     let atuacao = detalhes.DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL
 
     let projetos_ensino = array
     let projetos_pesquisa = array
 
-    // criar banco de dados para pesquisa e para ensino
+    // criando banco de dados para pesquisa e para ensino
     for entry in atuacao {
         // filtrar outras atividades
         if "ATIVIDADES-DE-PARTICIPACAO-EM-PROJETO" in entry.keys() {
@@ -755,12 +757,12 @@
             // ordem os projetos
             let projetos = projetos.sorted(key: (item) => (item.ANO-INICIO, item.ANO-FIM, item.MES-FIM, item.MES-INICIO))
 
-            // criar array para pesquisa
+            // criando array para pesquisa
             projetos_pesquisa = projetos.filter(
                 entry => entry.at("PROJETO-DE-PESQUISA").NATUREZA == "PESQUISA"
             )
 
-            // criar array para ensino
+            // criando array para ensino
             projetos_ensino = projetos.filter(
                 entry => entry.at("PROJETO-DE-PESQUISA").NATUREZA == "ENSINO"
             )
@@ -770,12 +772,12 @@
     if projetos_pesquisa.len() > 0 or projetos_ensino > 0 {
         [= Projetos <projetos_atuacao>]
 
-        // criar área de pesquisa
+        // criando área de pesquisa
         if projetos_pesquisa.len() > 0 {
             [== Projetos de pesquisa]
 
             for project in projetos_pesquisa.rev() {
-                // criar variáveis
+                // criando variáveis
                 let membros = ()
                 let tempo_content = ()
                 
@@ -787,7 +789,7 @@
                     tempo_content = [#subset.ANO-INICIO - atual]
                 }
                 
-                // criar membros de projeto
+                // criando membros de projeto
                 if "EQUIPE-DO-PROJETO" in subset.keys() {
                     // create array of persons involved
                     let integrantes = subset.EQUIPE-DO-PROJETO.at("INTEGRANTES-DO-PROJETO")
@@ -821,7 +823,7 @@
                     producoes = subset.PRODUCOES-CT-DO-PROJETO.PRODUCAO-CT-DO-PROJETO.len()
                 }
 
-                // criar content
+                // criando content
                 let descricao_content = [
                     #subset.NOME-DO-PROJETO
                     #linebreak()
@@ -832,6 +834,7 @@
                     #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + subset.DESCRICAO-DO-PROJETO)
                 ]
 
+                // publicando content
                 create-cols([*#tempo_content*], [#descricao_content], "small")
             }
             linebreak()
@@ -841,7 +844,7 @@
             [== Projetos de ensino]
 
             for project in projetos_ensino.rev() {
-                // criar variáveis
+                // criando variáveis
                 let membros = ()
                 let tempo_content = ()
                 
@@ -853,7 +856,7 @@
                     tempo_content = [#subset.ANO-INICIO - atual]
                 }
                 
-                // criar membros de projeto
+                // criando membros de projeto
                 if "EQUIPE-DO-PROJETO" in subset.keys() {
                     // create array of persons involved
                     let integrantes = subset.EQUIPE-DO-PROJETO.at("INTEGRANTES-DO-PROJETO")
@@ -887,7 +890,7 @@
                     producoes = subset.PRODUCOES-CT-DO-PROJETO.PRODUCAO-CT-DO-PROJETO.len()
                 }
 
-                // criar content
+                // criando content
                 let descricao_content = [
                     #subset.NOME-DO-PROJETO
                     #linebreak()
@@ -898,6 +901,7 @@
                     #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + subset.DESCRICAO-DO-PROJETO)
                 ]
 
+                // publicando content
                 create-cols([*#tempo_content*], [#descricao_content], "small")
             }
             
@@ -908,15 +912,14 @@
     }
 }
 
-// Criando áreas de conhecimento
-// Criar a lista de áreas de conhecimento
-// Argumentos
+// Função create-revisor(): Cria áreas de revisor (periódico, assessora, fomento)
+// Argumento:
 //  - detalhes: o banco de dados de Lattes (TOML File)
 #let create-revisor(detalhes) = {
 
-    // criar banco de dados
+    // criando banco de dados
     let atuacao = detalhes.DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL
-    // TODO: 3 cases so far
+    // TODO: 3 casos até agora
     let periodico = ()
     let assessora = ()
     let fomento = ()
@@ -943,10 +946,10 @@
 
     // Caso revisor de periódicos
     if periodico.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [= Revisor de periódico <periodicos>]
 
-        // criar variáveis
+        // criando variáveis
         let tempo_content = []
 
         // loop para cada entrada
@@ -954,7 +957,7 @@
             // loop para mais informações do vínculo
             for vinculo in entrada {
                 
-                // criar tempo
+                // criando tempo
                 if entrada.VINCULOS.ANO-FIM == "" {
                     tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
                 } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
@@ -971,10 +974,10 @@
                 informacao = text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + entrada.VINCULOS.OUTRAS-INFORMACOES)
             }
 
-            // criar conteúdo
+            // criando conteúdo
             let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
             
-            // publicar conteúdo
+            // publicando content
             create-cols([*#tempo_content*], descricao_content, "small")
 
         }
@@ -987,10 +990,10 @@
 
     // caso membro de comitê de assessora
     if assessora.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [= Membro de comitê de assessora <assessora>]
 
-        // criar variáveis
+        // criando variáveis
         let tempo_content = []
 
         // loop para cada entrada
@@ -998,7 +1001,7 @@
             // loop para mais informações do vínculo
             for vinculo in entrada {
                 
-                // criar tempo
+                // criando tempo
                 if entrada.VINCULOS.ANO-FIM == "" {
                     tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
                 } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
@@ -1015,11 +1018,11 @@
                 informacao = text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + entrada.VINCULOS.OUTRAS-INFORMACOES)
             }
 
-            // criar conteúdo
+            // criando content
             let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
             
-            // publicar conteúdo
-            create-cols([*#tempo_content*], descricao_content, "small")
+            // publicando content
+            // publicando[*#tempo_content*], descricao_content, "small")
 
         }
 
@@ -1031,10 +1034,10 @@
 
     // caso revisor de projeto de agência de fomento
     if fomento.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [= Revisor de projeto de agência de fomento <fomento>]
 
-        // criar variáveis
+        // criando variáveis
         let tempo_content = []
 
         // loop para cada entrada
@@ -1042,7 +1045,7 @@
             // loop para mais informações do vínculo
             for vinculo in entrada {
                 
-                // criar tempo
+                // criando tempo
                 if entrada.VINCULOS.ANO-FIM == "" {
                     tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
                 } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
@@ -1059,11 +1062,11 @@
                 informacao = text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + entrada.VINCULOS.OUTRAS-INFORMACOES)
             }
 
-            // criar conteúdo
+            // criando content
             let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
             
-            // publicar conteúdo
-            create-cols([*#tempo_content*], descricao_content, "small")
+            // publicando content
+            // publicando[*#tempo_content*], descricao_content, "small")
 
         }
 
@@ -1074,25 +1077,24 @@
     } 
 }
 
-// Criando áreas de conhecimento
-// Criar a lista de áreas de conhecimento
-// Argumentos
+// Função create-areas-work: Cria áreas de conhecimento
+// Argumento:
 //  - detalhes: o banco de dados de Lattes (TOML File)
-#let create-areas-atuacao(detalhes) = {
+#let create-areas-work(detalhes) = {
     let areas_atuacao = detalhes.DADOS-GERAIS.AREAS-DE-ATUACAO.AREA-DE-ATUACAO
 
     // somente criar essa área se tiver ao mínimo uma entrada
     if areas_atuacao.len() > 0 {
 
-        // criar cabeçalho
+        // criando cabeçalho
         [= Área de atuação <areas_atuacao>]
 
-        // criar número para ordem
+        // criando número para ordem
         let i = 1
 
         // loop pelo entrada, pode ter ordem de 4 áreas em uma entrada
         for entrada in areas_atuacao {
-            // criar variáveis
+            // criando variáveis
             let descricao_content = []
             
             // Manipular GRANDE ÁREA (para Ciências Humanas tinha um _ e todas as letras maiúsculas)
@@ -1104,7 +1106,7 @@
             let grande_area_parts = grande_area.split("_")
             grande_area = grande_area_parts.map(capitalize).join(" ")
             
-            // criar descricao
+            // criando descricao
             if entrada.NOME-DA-ESPECIALIDADE == "" {
                 if entrada.NOME-DA-SUB-AREA-DO-CONHECIMENTO == "" {
                     if entrada.NOME-DA-AREA-DO-CONHECIMENTO == "" {
@@ -1128,8 +1130,8 @@
                 ]
             }
 
-            // publicar content
-            create-cols([*#i. *], [#descricao_content], "enum")
+            // publicando content
+            // publicando[*#i. *], [#descricao_content], "enum")
             
             // aumentar número para ordem
             i += 1
@@ -1140,9 +1142,9 @@
     line(length: 100%)
 }
 
-// Criando a área de técnicos
+// Função create-technical: Cria área de produções técnicos (usado em create-bibliography)
 // TODO: Até agora somente categoria "demais produções técnicos"
-// Argumentos
+// Argumentos:
 //  - dados_tecnicos: subset do banco de dados com só técnios
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo Lattes
@@ -1157,7 +1159,7 @@
 
     // Then i loop into arrays
     for entrada in dados_tecnicos {
-        // criar variáveis
+        // criando variáveis
         let autores = ()
         let palavras_chave = ()
         let conhecimento = ()
@@ -1173,7 +1175,7 @@
         // formatar os autores
         let autores = format_authors(entrada.AUTORES, eu)     
         
-        // criar entradas
+        // criando entradas
         // TODO:  até agora somente esses dois casos
         // relatório
         if "DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA" in entrada.keys() {
@@ -1191,7 +1193,7 @@
             homepage = entrada.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.HOME-PAGE-DO-TRABALHO
         }
 
-        // criar lista de palavras-chave
+        // criando lista de palavras-chave
         if "PALAVRAS-CHAVE" in entrada.keys() {
             for word in entrada.PALAVRAS-CHAVE.keys() {
                 if entrada.PALAVRAS-CHAVE.at(word) != "" {
@@ -1200,7 +1202,7 @@
             }
         }
 
-        // criar string de palavras-chave
+        // criando string de palavras-chave
         if palavras_chave.len() > 0 {
             palavras_chave = palavras_chave.join("; ")
         }
@@ -1227,12 +1229,12 @@
             }
         }
 
-        // criar string de áreas de conhecimento
+        // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
             conhecimento = conhecimento.join("; ")
         }
         
-        // criar content para palavras-chave
+        // criando content para palavras-chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
@@ -1240,7 +1242,7 @@
             palavras_content = []
         }
             
-        // criar content para áreas de conhecimento 
+        // criando content para áreas de conhecimento 
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
@@ -1248,14 +1250,14 @@
             areas_content = []
         }
 
-        // criar link, se tem DOI, somente usar doi e não homepage
+        // criando link, se tem DOI, somente usar doi e não homepage
         if doi != "" { 
             url_link = [#link("https://doi.org/" + doi)[#doi]]
         } else if homepage != "" {
             url_link = [#link(homepage)[#homepage]]
         }
 
-        // criar o conteúdo
+        // criando o conteúdo
         let descricao_content = []
         if tipo_lattes == "completo" {
             descricao_content = [#autores #titulo. #ano (#tipo). #url_link#linebreak()#palavras_content #areas_content]
@@ -1266,21 +1268,20 @@
         // diminuir número (ordem)
         i -= 1
 
-        // publicar o conteúdo
-        create-cols([*#i*], [#descricao_content], "enum")
+        // publicando content
+        // publicando[*#i*], [#descricao_content], "enum")
     }
 }
 
-// Criando publicacoes bibliograficos: apresentacoes
-// criar lista de apresentações de trabalho e palestra
-// argumentos
+// Função create-presentations: Cria produções bibliograficos: apresentacoes (usado em create-bibliography())
+// Argumentos:
 //  - dados_apresentacoes: subset do banco de dados com só apresentações
 //  - me: nome para destacar nas entradas
 #let create-presentations(dados_apresentacoes, eu) = {
 
     [=== Apresentação de trabalho e palestra <producao_apresentacoes>]
 
-    // criar número para ordem
+    // criando número para ordem
     let i = dados_apresentacoes.len() + 1
     // loop nas entradas de apresentacoes
     for entrada in dados_apresentacoes.rev() {
@@ -1311,12 +1312,12 @@
             }
         }
 
-        // criar string de palavras-chave
+        // criando string de palavras-chave
         if palavras_chave.len() > 0 {
             palavras_chave = palavras_chave.join("; ")
         }
 
-        // criar areas de conhecimento
+        // criando areas de conhecimento
         if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
             for evento in entrada.AREAS-DO-CONHECIMENTO.keys() {
                 let subset2 = entrada.AREAS-DO-CONHECIMENTO.at(evento)
@@ -1338,7 +1339,7 @@
             }
         }
 
-        // criar string de áreas de conhecimento
+        // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
             conhecimento = conhecimento.join("; ")
         }
@@ -1350,7 +1351,7 @@
             resumo = ""
         }
         
-        // criar content para palavras_chave
+        // criando content para palavras_chave
         let palavras_content = []
             if palavras_chave.len() > 0 {
                 palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
@@ -1358,7 +1359,7 @@
                 palavras_content = []
             }
             
-        // criar content para areas 
+        // criando content para areas 
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
@@ -1366,20 +1367,19 @@
             areas_content = []
         }
 
-        // criar o conteúdo
+        // criando o conteúdo
         let descricao_content= [#autores #titulo. #ano (#tipo)#linebreak()#palavras_content #areas_content #resumo]
         
         // diminuir o númoer
         i -= 1
 
-        // publicar o conteúdo
+        // publicando content
         create-cols([*#i*], [#descricao_content], "enum")
     }
 }
 
-// Criando publicacoes bibliograficos: capitulos
-// criar lista de capitulos
-// argumentos
+// Função create-chapters(): Cria produções bibliograficos: capitulos (usado em create-bibliography())
+// Argumentos:
 //  - dados_capitulos: subset do banco de dados com só capitulos
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo lattes
@@ -1387,7 +1387,7 @@
 
     [=== Capitulos de livros publicados <publicacao_capitulos>]
 
-    // criar número para ordem
+    // criando número para ordem
     let i = dados_capitulos.len()
 
     for entrada in dados_capitulos.rev() {
@@ -1416,7 +1416,7 @@
             pagina = [#subset.DETALHAMENTO-DO-CAPITULO.PAGINA-INICIAL - #subset.DETALHAMENTO-DO-CAPITULO.PAGINA-FINAL]
         }
 
-        // criar lista de palavras-chave
+        // criando lista de palavras-chave
         if "PALAVRAS-CHAVE" in subset.keys() {
             for palavra in subset.PALAVRAS-CHAVE.keys() {
                 if subset.PALAVRAS-CHAVE.at(palavra) != "" {
@@ -1425,12 +1425,12 @@
             }
         }
 
-        // criar string de palavras-chave
+        // criando string de palavras-chave
         if palavras_chave.len() > 0 {
             palavras_chave = palavras_chave.join("; ")
         }
 
-        // criar lista de areas de conhecimento
+        // criando lista de areas de conhecimento
         if "AREAS-DO-CONHECIMENTO" in subset.keys() {
             for entrada in subset.AREAS-DO-CONHECIMENTO.keys() {
                 let subset2 = subset.AREAS-DO-CONHECIMENTO.at(entrada)
@@ -1452,7 +1452,7 @@
             }
         }
 
-        // criar string de áreas de conhecimento
+        // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
             conhecimento = conhecimento.join("; ")
         }
@@ -1475,18 +1475,18 @@
         }
         editores = editores.join("; ")
 
-        // criar o link, prefire DOI 
+        // criando o link, prefire DOI 
         let doi_link = []
         if doi.len() > 0 {
             doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
         }
 
-        // criar edicao 
+        // criando edicao 
         if edicao != "" {
             edicao = [ed. #edicao: ]
         }
         
-        // criar local & editora
+        // criando local & editora
         let local_editora_content = []
         if local != "" and editora != "" {
             local_editora_content = [#local: #editora,] 
@@ -1496,10 +1496,10 @@
             local_editora_content = [#editora,]
         } 
 
-        // criar citação
+        // criando citação
         let citacao = [#autores #titulo. In: #editores (ed.). #emph(titulo_livro). #local_editora_content, #ano. p. #pagina. #doi_link #linebreak()]
 
-        // criar content palavras-chave
+        // criando content palavras-chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
@@ -1507,7 +1507,7 @@
             palavras_content = []
         }
 
-        // criar content para áreas de conhecimento
+        // criando content para áreas de conhecimento
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
@@ -1515,14 +1515,14 @@
             areas_content = []
         }
 
-        // criar conteúdo 
+        // criando conteúdo 
         let descricao_content = []
         if tipo_lattes == "completo" {
             descricao_content = [#citacao #palavras_content #areas_content]
         } else {
             descricao_content = [#citacao]
         }
-        // publicar conteúdo
+        // publicando content
         create-cols([*#i*], [#descricao_content], "enum")
 
         // diminuir número para ordem
@@ -1530,22 +1530,23 @@
     }    
 }
 
-// criar a área de livros
-// argumentos:
+// Função create-books(): cria a área de produções bibliográficas - livros (usado em create-bibliography())
+// Argumentos:
 //  - dados_livros: subset do banco de dados com só livros
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo lattes
 #let create-books(dados_livros, eu, tipo_lattes) = {
     
+    // criando cabeçalha
     [=== Livros publicados <publicacao_livros>]
     
-    // criar número para ordem
+    // criando número para ordem
     let i = dados_livros.len()
 
     for entrada in dados_livros.rev() {
-        // criar subset 
+        // criando subset 
         let subset = entrada
-        // criar variáveis
+        // criando variáveis
         let palavras_chave= ()
         let conhecimento = ()
 
@@ -1572,7 +1573,7 @@
             }
         }
 
-        // criar string de palavras-chave
+        // criando string de palavras-chave
         if palavras_chave.len() > 0 {
             palavras_chave = palavras_chave.join("; ")
         }
@@ -1599,19 +1600,19 @@
             }
         }
 
-        // criar string de áreas de conhecimento
+        // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
             conhecimento = conhecimento.join("; ")
         }
 
-        // criar citação
-        // criar link (prefire DOI)
+        // criando citação
+        // criando link (prefire DOI)
         let doi_link = []
         if doi.len() > 0 {
             doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
         }
         
-        // criar local & editora
+        // criando local & editora
         let local_editora_content = []
         if local != "" and editora != "" {
             local_editora_content = [#local: #editora,] 
@@ -1621,22 +1622,22 @@
             local_editora_content = [#editora,]
         } 
 
-        // criar citacao
+        // criando citacao
         let citacao = [#autores #titulo. #local_editora_content #ano, p. #pagina. #doi_link #linebreak()]
 
-        // criar content palavras-chave
+        // criando content palavras-chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
         } 
 
-        // criar content para área
+        // criando content para área
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento)]
         } 
 
-        // criar descricao
+        // criando descricao
         let descricao_content = []
         if tipo_lattes == "completo" {
             descricao_content = [#citacao #palavras_content #areas_content]
@@ -1644,7 +1645,7 @@
             descricao_content = [#citacao]
         }        
         
-        // publicar entrada
+        // publicando content
         create-cols([*#i*], [#descricao_content], "enum")
         
         // diminuir número
@@ -1652,20 +1653,20 @@
     }
 }
 
-// criar a área de artigos
-// argumentos:
+// Função create-articles(): cria a área de produções bibliográficas - artigos (usado em create-bibliography())
+// Argumentos:
 //  - dados_artigos: subset do banco de dados com só livros
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo Lattes
 #let create-articles(dados_artigos, eu, tipo_lattes) = {
 
-    // criar cabeçalho
+    // criando cabeçalho
     [=== Artigos completos publicados em periódicos <publicacao_artigos>]
     
-    // criar número para ordem
+    // criando número para ordem
     let i = dados_artigos.len()
 
-    // criar entrada para cada artigo
+    // criando entrada para cada artigo
     for entrada in dados_artigos.rev() {
         // initialize variables
         let palavras_chave = ()
@@ -1697,7 +1698,7 @@
             }
         }
 
-        // criar string de palavras_chave
+        // criando string de palavras_chave
         if palavras_chave.len() > 0 {
             palavras_chave = palavras_chave.join("; ")
         }
@@ -1723,34 +1724,34 @@
             }
         }
 
-        // criar string de áreas de conhecimento
+        // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
             conhecimento = conhecimento.join("; ")
         }
 
-        // criar conteúdo
-        // criar link: DOI
+        // criando conteúdo
+        // criando link: DOI
         let doi_link = []
         if doi.len() > 0 {
             doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
         }
 
-        // criar content citação
+        // criando content citação
         let citacao = [#autores #titulo. #emph(periodico). v. #volume. p. #pagina, #ano. #doi_link #linebreak()]
         
-        // criar content palavras chave
+        // criando content palavras chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
         } 
         
-        // criar content para áreas de conhecimento
+        // criando content para áreas de conhecimento
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento)]
         } 
 
-        // criar content para descrição 
+        // criando content para descrição 
         let descricao_content = []
         if tipo_lattes == "completo" {
             descricao_content = [#citacao #palavras_content #areas_content]
@@ -1758,7 +1759,7 @@
             descricao_content = [#citacao]
         }
         
-        // publicar content
+        // publicando content
         create-cols([*#i*], [#descricao_content], "enum")
         
         // diminuir número para ordem
@@ -1766,14 +1767,13 @@
     }   
 }
 
-// Criando as publicações: Artigos publicados, livros publicados, capítulos publicados e demais técnicos
-// Criar a area de Produção Bibliografica
-// argumentos:
+// Função create-bibliography: Cria área de Produções: Artigos publicados, livros publicados, capítulos publicados e demais técnicos
+// Argumentos:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo Lattes
 #let create-bibliography(detalhes, eu, tipo_lattes) = {
-    // criar banco de dados
+    // criando banco de dados
 
     //  artigos
     let artigos = detalhes.PRODUCAO-BIBLIOGRAFICA.ARTIGOS-PUBLICADOS.ARTIGO-PUBLICADO
@@ -1809,7 +1809,7 @@
 
     let todos = relatorio.rev() + didatico.rev()
 
-    // criar cabeçalho
+    // criando cabeçalho
     if artigos.len() > 0 or livros.len() > 0 or capitulos.len() > 0 or todos.len() > 0 {
         [= Produção <producao>]
 
@@ -1817,22 +1817,22 @@
 
     }
 
-    // criar área de artigos
+    // criando área de artigos
     if artigos.len() > 0 {
         create-articles(artigos, eu, tipo_lattes)
     }
 
-    // criar área de livros
+    // criando área de livros
     if livros.len() > 0 {
         create-books(livros, eu, tipo_lattes)
     }
 
-    // criar área de capítulos
+    // criando área de capítulos
     if capitulos.len() > 0 {
         create-chapters(capitulos, eu, tipo_lattes)
     }
 
-    // criar área de apresentações
+    // criando área de apresentações
     if tipo_lattes == "completo" {
         if apresentacoes.len() > 0 {
             create-presentations(apresentacoes, eu)
@@ -1840,7 +1840,7 @@
     }
     
 
-    // criar área de técnicos
+    // criando área de técnicos
     if todos.len() > 0 {
         create-technicals(todos, eu, tipo_lattes)
     }
@@ -1850,9 +1850,8 @@
     line(length: 100%)
 }
 
-// Criando projetos (dentro de inovação)
-// Criar os projetos de ensino, e projetos de pesquisa
-// Argumentos
+// Função create-projects-ct(): Cria projetos de CT (dentro de inovação, usado em create-innovations())
+// Argumentos:
 //  - data-research: o banco de dados com projetos de pesquisa
 //  - data-ensino: o banco de dados com projetos de ensino
 #let create-projects-ct(data-research, data-teaching) = {           
@@ -1864,7 +1863,7 @@
         let i = data-research.len() + 1
 
         for projeto in data-research {
-            // criar um banco de dados para projeto
+            // criando um banco de dados para projeto
             let subset = projeto.at("PROJETO-DE-PESQUISA")
 
             // declara variáveis (dependente da situacao)
@@ -1888,9 +1887,9 @@
                 situacao = subset.SITUACAO.slice(0,1) + lower(subset.SITUACAO.slice(1))
             }
                 
-            // criar membros
+            // criando membros
             if "EQUIPE-DO-PROJETO" in subset.keys() {
-                // criar array para pessoas
+                // criando array para pessoas
                 let pessoas = subset.EQUIPE-DO-PROJETO.at("INTEGRANTES-DO-PROJETO")
 
                 // loop para cada entrada em integrantes
@@ -1918,9 +1917,9 @@
                 }
             }
 
-            // criar financiadores
+            // criando financiadores
             if "FINANCIADORES-DO-PROJETO" in subset.keys() {
-                // criar array de financiadores
+                // criando array de financiadores
                 let pessoas = subset.FINANCIADORES-DO-PROJETO.at("FINANCIADOR-DO-PROJETO")
 
                 // loop para cada entrada de financiadores
@@ -1946,8 +1945,8 @@
                 }
             }
 
-            // criar conteúdo
-            // criar strings para cada informação
+            // criando conteúdo
+            // criando strings para cada informação
             let membros_string = []
             if membros.len() > 0 {
                 membros_string = [#text(rgb("B2B2B2"), size: 0.85em, "Integrante(s): "+ membros.join("; "))#linebreak()]
@@ -1975,7 +1974,7 @@
             
             let descricao_content = [#titulo #linebreak() #mais_informacoes #membros_string #subvencoes_string #cta_string]
 
-            // criar conteúdo final
+            // publicando content
             create-cols([*#ano*], [#descricao_content], "wide")
         }
     }
@@ -1988,10 +1987,10 @@
         let i = data-teaching.len() + 1
 
         for projeto in data-teaching.rev() {
-            // criar banco de dados para projeto
+            // criando banco de dados para projeto
             let subset = projeto.at("PROJETO-DE-PESQUISA")
             
-            // criar variáveis
+            // criando variáveis
             let ano = ""
             let situacao = ""
             let tipo = ""
@@ -2010,9 +2009,9 @@
                 situacao = subset.SITUACAO.slice(0,1) + lower(subset.SITUACAO.slice(1))
             }
             
-            // criar membros do projeto
+            // criando membros do projeto
             if "EQUIPE-DO-PROJETO" in subset.keys() {
-                // criar array de pessoas
+                // criando array de pessoas
                 let pessoas = subset.EQUIPE-DO-PROJETO.at("INTEGRANTES-DO-PROJETO")
 
                 // loop por entradas de pessoas
@@ -2037,9 +2036,9 @@
                 }
             }
 
-            // criar financidores
+            // criando financidores
             if "FINANCIADORES-DO-PROJETO" in subset.keys() {
-                // criar array de financiadores
+                // criando array de financiadores
                 let pessoas = subset.FINANCIADORES-DO-PROJETO.at("FINANCIADOR-DO-PROJETO")
 
                 // loop pelas entradas de financiadores
@@ -2063,10 +2062,10 @@
                 }
             }
 
-            // create content                
+            // criando content                
             let descricao = [#text(rgb("B2B2B2"), size: 0.85em, "Descrição: "+ informacao)#linebreak()]
 
-            // criar string para membros
+            // criando string para membros
             let membros_string = []
             if membros.len() > 0 {
                 membros_string = [#text(rgb("B2B2B2"), size: 0.85em, "Integrante(s): "+ membros.join("; "))#linebreak()]
@@ -2074,7 +2073,7 @@
                 membros_string = []
             }
                 
-            // criar string para subvencoes
+            // criando string para subvencoes
             let subvencoes_string = []
             if subvencoes.len() > 0 {
                 subvencoes_string = [#text(rgb("B2B2B2"), size: 0.85em, "Financiador(es): " + subvencoes.join("; "))#linebreak()]
@@ -2082,7 +2081,7 @@
                 subvencoes_string = []
             }
             
-            // criar string para cta
+            // criando string para cta
             let cta_string = []
             if cta > 0 {
                 cta_string = [#text(rgb("B2B2B2"), size: 0.85em, "Número de produções C, T & A: "+ str(cta))]
@@ -2090,9 +2089,10 @@
                 cta_string = []
             }
 
-            // criar conteúdo
+            // criando content
             let descricao_content = [#titulo #linebreak() #descricao #membros_string #subvencoes_string #cta_string]
 
+            // publicando content
             create-cols([*#ano*], [#descricao_content], "wide")
         }
     }
@@ -2101,28 +2101,27 @@
 // }
 
 
-// Criandao Educação e Popularização
-// Essa função cria a parte de educação e popularização (parte da inovação)
+// Função create-education-ct(): Cria área Educação e Popularização (parte da inovação, usado em create-innovations())
 // TODO: até agora somente apresentação de trabalho e palestra
-// Argumentos
+// Argumento:
 //  - dados_educacao_ct: subset para invoção - educação e popularização
 #let create-education-ct(dados_educacao_ct) = {
     if dados_educacao_ct.len() > 0 {
-        // criar cabeçalho 
+        // criando cabeçalho 
         // TODO: até agora somente essa categoria, com mais categorias precisa mudar pra cima
         [== Educação e Popularização de C&T <ct>]
 
         [=== Apresentação de trabalho e palestra <ct_apresentacoes>]
             
-        // criar números para oddem
+        // criando números para oddem
         let i = dados_educacao_ct.len()
 
         for entrada in dados_educacao_ct.rev() {
 
-            // criar sub-banco de dados para cada entrada
+            // criando sub-banco de dados para cada entrada
             let subset = entrada.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO
             
-            // criar variáveis
+            // criando variáveis
             let evento = entrada.DETALHAMENTO-DA-APRESENTACAO-DE-TRABALHO.NOME-DO-EVENTO
             let ano = subset.ANO
             let titulo = subset.TITULO
@@ -2135,10 +2134,10 @@
                 natureza = "Seminário"
             }
                                 
-            // criar conteúdo 
+            // criando conteúdo 
             let descricao_content = [#strong(evento), #ano (#natureza). #titulo]
 
-            // criar conteúdo final
+            // publicando content
             create-cols([*#i.*], [#descricao_content], "enum")
 
             // diminuir número (para ordem)
@@ -2148,15 +2147,14 @@
     }
 }
 
-// Criandao Inovações 
-// Criar o cabeçalho de Inovação e as partes de projetos e educação de CT
-// Argumentos
+// Função create-innovations(): Cria Inovações 
+// Argumento:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 #let create-innovations(detalhes) = {
-    // criar banco de dados geral
+    // criando banco de dados geral
     let atuacao = detalhes.DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL
 
-    // criar variáveis
+    // criando variáveis
     let projetos = ()
     let proj_ensino = ()
     let proj_pesquisa = ()
@@ -2164,15 +2162,15 @@
     let congressos = () 
     let marker = true
 
-    // criar a soma de
-    // criar um loop para cada atuação para recolher todos os projetos
+    // criando a soma de
+    // criando um loop para cada atuação para recolher todos os projetos
     for entrada in atuacao {
         // set to empty
         projetos = ()
         proj_ensino = ()
         proj_pesquisa = ()
         
-        // criar o banco de dados
+        // criando o banco de dados
         if "ATIVIDADES-DE-PARTICIPACAO-EM-PROJETO" in entrada.keys() {
             projetos = entrada.ATIVIDADES-DE-PARTICIPACAO-EM-PROJETO.at("PARTICIPACAO-EM-PROJETO")
         }
@@ -2192,7 +2190,7 @@
             )
         }
 
-        // criar cabeçalho
+        // criando cabeçalho
         if proj_pesquisa.len() > 0 or proj_ensino.len() > 0 {
             [= Inovação <inovacao>]
             marker = false
@@ -2206,11 +2204,11 @@
     }
 
     // Dados de congressos não são vinculados com a atuação
-    // criar banco de dados
+    // criando banco de dados
     // educacao e popularizacao de C&T
     eventos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA
 
-    // criar banco de dados de apresentações
+    // criando banco de dados de apresentações
     congressos = eventos.APRESENTACAO-DE-TRABALHO
 
     // ordenar por ano 
@@ -2235,57 +2233,56 @@
     line(length: 100%)
 }
 
-// Criando entradas para orientações
-// Esta função cria a visão geral das supervisões.
-// Argumentos
+// Função create-supervisions(): Cria entradas para orientações/supervisões 
+// Argumento:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 #let create-supervisions(detalhes) = {
-    // criar bancos de dados
+    // criando bancos de dados
     let orientacao = detalhes.OUTRA-PRODUCAO
 
-    // criar variáveis
+    // criando variáveis
     let descricao_content = []
 
-    // criar seção só se tiver entradas em orientações
+    // criando seção só se tiver entradas em orientações
     // TODO: Não tenho certeza sobre o key "ORIENTACOES-EM-ANDAMENTO
     if "ORIENTACOES-CONCLUIDAS" in orientacao or "ORIENTACOES-EM-ANDAMENTO" in orientacao {
-        // criar cabeçalho
+        // criando cabeçalho
         [= Orientações e Supervisões <orientacao>]
        
         // Orientations em andamento
         // TODO: Não tenho certeza sobre o key, provavelmente dê erro
         if "ORIENTACOES-EM-ANDAMENTO" in orientacao.keys() {
-            // criar banco de dados
+            // criando banco de dados
             let andamento = orientacao.ORIENTACOES-EM-ANDAMENTO
 
-            // criar cabeçalho
+            // criando cabeçalho
             [== Orientações e supervisões em andamento <orientacao_andamento>]
 
             // para doutorado
             // TODO: não tenho certeza sobre o key, provavelmente dê erro
             if "OUTRAS-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO" in andamento.keys() {
 
-                // criar bancos de dados
+                // criando bancos de dados
                 let doutorado = andamento.ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO
                 
                 // ordenar por ano (descendo)
                 let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO))
 
-                // Criar Orientador
+                // criando Orientador
                 // filtrar para funcção (aqui: orientador)
                 let doutorado_filtro = doutorado_ordem.filter(
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
                 )
 
-                // criar conteúdo somente se tiver uma entrada
+                // criando conteúdo somente se tiver uma entrada
                 if doutorado_filtro.len() > 0 {
-                    // criar cabeçålho
+                    // criando cabeçålho
                     [=== Tese de doutorado: orientador <orientacao_andamento_doutorado_orientador>]
                     
-                    // criar número para ordenar
+                    // criando número para ordenar
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
-                        // criar varíaveis
+                        // criando varíaveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
@@ -2293,30 +2290,31 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar entrada final
+                        // criando entrada final
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         i -= 1
                     }
                 }
 
-                // Criar Co-orientador
+                // criando co-orientador
                 // filtrar para funcção (aqui: orientador)
                 let doutorado_filtro = doutorado_ordem.filter(
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
                 )
 
-                // criar conteúdo somente se tiver uma entrada
+                // criando conteúdo somente se tiver uma entrada
                 if doutorado_filtro.len() > 0 {
-                    // criar cabeçålho
+                    // criando cabeçålho
                     [=== Tese de doutorado: co-orientador <orientacao_andamento_doutorado_coorientador>]
                     
-                    // criar número para ordenar
+                    // criando número para ordenar
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
-                        // criar varíaveis
+                        // criando varíaveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
@@ -2324,9 +2322,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar entrada final
+                        // criando entrada final
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         i -= 1
@@ -2336,28 +2335,28 @@
             
             // para mestrado
             if "ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO" in andamento.keys() {
-                // criar banco de dados
+                // criando banco de dados
                 let mestrado = andamento.ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO
                 
                 // ordenar as entradas
                 let mestrado_ordem = mestrado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO))
 
-                // Criar Orientador
+                // criando orientador
                 // filtrar para "orientador"
                 let mestrado_filtro = mestrado_ordem.filter(
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
                 )
                 
-                // criar conteúdo somente se tiver uma entrada
+                // criando conteúdo somente se tiver uma entrada
                 if mestrado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Dissertações de mestrado: orientador <orientacao_andamento_mestrado_orientador>] 
 
-                    // criar número para enumerar
+                    // criando número para enumerar
                     let i = mestrado_filtro.len()
                 
                     for entrada in mestrado_filtro.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
@@ -2365,31 +2364,32 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar conteúdo final
+                        // publicando content
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         i -= 1
                     }
                 }
 
-                // Criar Co-orientador
+                // criando co-orientador
                 // filtrar para "co-orientador"
                 let mestrado_filtro = mestrado_ordem.filter(
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
                 )
                 
-                // criar conteúdo somente se tiver uma entrada
+                // criando conteúdo somente se tiver uma entrada
                 if mestrado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Dissertações de mestrado: co-orientador <orientacao_andamento_mestrado_coorientador>] 
 
-                    // criar número para enumerar
+                    // criando número para enumerar
                     let i = mestrado_filtro.len()
                 
                     for entrada in mestrado_filtro.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
@@ -2397,9 +2397,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar conteúdo final
+                        // publicando content
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         i -= 1
@@ -2410,22 +2411,22 @@
             // para TCC (graduação, sem separação entre orientador ou co-orientador)
             // TODO: Não tenho certeza sobre o key
             if "OUTRAS-ORIENTACOES-EM-ANDAMENTO" in andamento.keys() {
-                // criar banco de dados
+                // criando banco de dados
                 let outras = andamento.OUTRAS-ORIENTACOES-EM-ANDAMENTO
 
                 // ordenar dados (descendo)
                 let outras_ordem = outras.sorted(key: (item) => (item.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-EM-ANDAMENTO.ANO))
 
-                // criar conteúdo se tiver ao mínimo uma entrada
+                // criando conteúdo se tiver ao mínimo uma entrada
                 if outras_ordem.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Trabalhos de conclusão de curso de graduação <orientacao_andamento_graduacao>]
 
-                    // criar número de entradas (para ordem)
+                    // criando número de entradas (para ordem)
                     let i = outras_ordem.len()
-                    // criar conteúdo para cada entrada
+                    // criando conteúdo para cada entrada
                     for entrada in outras_ordem.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-OUTRAS-ORIENTACOES-EM-ANDAMENTO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-EM-ANDAMENTO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-EM-ANDAMENTO.ANO
@@ -2445,10 +2446,10 @@
                         // Capitalize cada parte e junte-as novamente com espaços
                         tipo = tipo_parts.map(capitalize).join(" ")
                         
-                        // criar conteúdo junto
+                        // criando conteúdo junto
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // Criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         i -= 1
@@ -2459,16 +2460,16 @@
 
         // Orientations concluidas
         if "ORIENTACOES-CONCLUIDAS" in orientacao.keys() {
-            // Criar cabeçalho
+            // criando cabeçalho
             [== Orientações e supervisões concluídas <orientacao_concluida>]
             
-            // criar banco de dados
+            // criando banco de dados
             let concluidos = orientacao.ORIENTACOES-CONCLUIDAS
             
             // TODO: não tenho certeza sobre o key
             // para doutorado
             if "OUTRAS-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO" in concluidos.keys() {
-                // criar banco de dados para tipo
+                // criando banco de dados para tipo
                 let doutorado = concluidos.ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO
                 
                 let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO))
@@ -2479,7 +2480,7 @@
                 )
                 
                 if doutorado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Tese de doutorado: orientador <orientacao_concluida_doutorado_orientador>]
 
                     let i = doutorado_filtro.len()
@@ -2491,10 +2492,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar conteúdo
+                        // criando conteúdo
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         // diminuir número para ordem
@@ -2508,7 +2509,7 @@
                 )
                 
                 if doutorado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Tese de doutorado: co-orientador <orientacao_concluida_doutorado_coorientador>]
 
                     let i = doutorado_filtro.len()
@@ -2520,10 +2521,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // criar conteúdo
+                        // criando conteúdo
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         // diminuir número para ordem
@@ -2534,7 +2535,7 @@
             
             // para Mestrado
             if "ORIENTACOES-CONCLUIDAS-PARA-MESTRADO" in concluidos.keys() {
-                // criar banco de dados
+                // criando banco de dados
                 let mestrado = concluidos.ORIENTACOES-CONCLUIDAS-PARA-MESTRADO
                 
                 let mestrado_ordem = mestrado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO))
@@ -2544,16 +2545,16 @@
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
                 )
                 
-                // criar conteúdo se tiver ao mínimo uma entrada
+                // criando conteúdo se tiver ao mínimo uma entrada
                 if mestrado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Dissertações de mestrado: orientador <orientacao_concluida_mestrado_orientador>] 
 
-                    // criar número para ordem (descendo)
+                    // criando número para ordem (descendo)
                     let i = mestrado_filtro.len()
                 
                     for entrada in mestrado_filtro.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO
@@ -2561,10 +2562,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // Criar conteúdo
+                        // criando content
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         // diminuir número (para ordem)
@@ -2577,16 +2578,16 @@
                     entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
                 )
                 
-                // criar conteúdo se tiver ao mínimo uma entrada
+                // criando conteúdo se tiver ao mínimo uma entrada
                 if mestrado_filtro.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Dissertações de mestrado: co-orientador <orientacao_concluida_mestrado_coorientador>] 
 
-                    // criar número para ordem (descendo)
+                    // criando número para ordem (descendo)
                     let i = mestrado_filtro.len()
                 
                     for entrada in mestrado_filtro.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO
@@ -2594,10 +2595,10 @@
                         let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
                         let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
 
-                        // Criar conteúdo
+                        // criando content
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
 
                         // diminuir número (para ordem)
@@ -2609,22 +2610,22 @@
             // para TCC / Graduação (sem separação de Co-orientador/orientador)
             // TODO: Não tenho certeza sobre o keys
             if "OUTRAS-ORIENTACOES-CONCLUIDAS" in concluidos.keys() {
-                // criar banco de dados
+                // criando banco de dados
                 let outras = concluidos.OUTRAS-ORIENTACOES-CONCLUIDAS
 
                 let outras_ordem = outras.sorted(key: (item) => (item.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-CONCLUIDAS.ANO))
 
                 // ao mínimo precisa uma entrada
                 if outras_ordem.len() > 0 {
-                    // criar cabeçalho
+                    // criando cabeçalho
                     [=== Trabalhos de conclusão de curso de graduação <orientacao_concluida_graduacao>]
 
-                    // criar número para ordem (descendo)
+                    // criando número para ordem (descendo)
                     let i = outras_ordem.len()
 
-                    // criar conteúdo para cada entrada
+                    // criando conteúdo para cada entrada
                     for entrada in outras_ordem.rev() {
-                        // criar variáveis
+                        // criando variáveis
                         let orientando = entrada.DETALHAMENTO-DE-OUTRAS-ORIENTACOES-CONCLUIDAS.NOME-DO-ORIENTADO
                         let titulo = entrada.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-CONCLUIDAS.TITULO
                         let ano = entrada.DADOS-BASICOS-DE-OUTRAS-ORIENTACOES-CONCLUIDAS.ANO
@@ -2643,10 +2644,10 @@
                         // Capitalize cada parte e junte-as novamente com espaços
                         tipo = tipo_parts.map(capitalize).join(" ")
                         
-                        // Criar conteúdo
+                        // criando content
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
 
-                        // criar conteúdo final
+                        // publicando content
                         create-cols([*#i.*], [#descricao_content], "enum")
                         
                         // diminuir número (para ordem)
@@ -2662,16 +2663,16 @@
     line(length: 100%)
 }
 
-// Criando entradas de participação em eventos
-// Esta função cria as entradas para a participação em eventos (não para o trabalho enviado nos eventos)
-// Argumentos:
+// Função create-events(): Cria entradas eventos
+// TODO: até agora somente participação em eventos
+// Argumento:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 #let create-events(detalhes) = {
     if "PARTICIPACAO-EM-EVENTOS-CONGRESSOS" in detalhes.DADOS-COMPLEMENTARES.keys() {
-        // criar banco de dados
+        // criando banco de dados
         let eventos = detalhes.DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS
 
-        // criar variáveis
+        // criando variáveis
         let descricao_content = []
 
         [= Eventos <eventos>]
@@ -2683,11 +2684,11 @@
             // Ordenar por ano e título
             let congressos_sorted = congressos.sorted(key: (item) => (item.DADOS-BASICOS-DA-PARTICIPACAO-EM-CONGRESSO.ANO, item.DADOS-BASICOS-DA-PARTICIPACAO-EM-CONGRESSO.TITULO))
 
-            // Criar número para ordem decrescente (vantagem: você pode ler diretamente em quantos eventos a pessoa participou)
+            // criando número para ordem decrescente (vantagem: você pode ler diretamente em quantos eventos a pessoa participou)
             let i = congressos_sorted.len()
             // loop pelas entradas
             for entrada in congressos_sorted.rev() {
-                // criar entradas
+                // criando entradas
                 let evento = entrada.DETALHAMENTO-DA-PARTICIPACAO-EM-CONGRESSO.NOME-DO-EVENTO
                 let subset = entrada.DADOS-BASICOS-DA-PARTICIPACAO-EM-CONGRESSO
                 let tipo = subset.TIPO-PARTICIPACAO
@@ -2695,10 +2696,10 @@
                 let natureza = subset.NATUREZA
                 let titulo = subset.TITULO
 
-                // criar texto
+                // criando texto
                 descricao_content = [#tipo em #strong(evento), #ano (natureza). #titulo]
 
-                // criar entrada final
+                // publicando content
                 create-cols([*#i.*], [#descricao_content], "enum")
 
                 // diminuir número (ordem descendo)
@@ -2708,21 +2709,21 @@
     }    
 }
 
-// Criando entradas de bancas
-// Esta função criará as entradas de participações em bancas de exame
-// Argumentos
+// Função create-examinations(): Cria entradas de bancas
+// TODO: Até agora somente bancas de conclusão
+// Argumentos:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 //  - me: nome para destacar no currículo (string)
 #let create-examinations(detalhes, me) = {
-    // criar banco de dados
+    // criando banco de dados
     let bancas = detalhes.DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO
 
-    // criar banco de dados para cada tipo
+    // criando banco de dados para cada tipo
     let bancas_graduacao = (:)
     let bancas_mestrado = (:)
     let bancas_doutorado = (:)
 
-    // criar banco de dados para cada tipo depende da existência
+    // criando banco de dados para cada tipo depende da existência
     // para graduação
     // TODO: Não tenho certeza sobre o key
     if "PARTICIPACAO-EM-BANCA-DE-GRADUACAO" in bancas.keys() {
@@ -2746,23 +2747,23 @@
         bancas_doutorado = (:)
     }
 
-    // criar entrada se ao mínimo um tipo de banca > 0
+    // criando entrada se ao mínimo um tipo de banca > 0
     if bancas_graduacao.len() > 0 or bancas_mestrado.len() > 0  or bancas_doutorado.len() > 0 [
         = Bancas <bancas>
         == Participação em banca de trabalhos de conclusão <bancas_conclusao>
     ]
 
-    // criar entradas para graduação, se ao mínimo tem uma entrada
+    // criando entradas para graduação, se ao mínimo tem uma entrada
     // TODO: Não tenho certeza sobre o key, provavelmente dê erro
     if bancas_graduacao.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [== Graduação <bancas_conclusao_graduacao>]
 
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_graduacao.len()
 
         for banca in bancas_graduacao {
-            // criar entradas
+            // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-GRADUACAO.NOME-DO-CANDIDATO
             let titulo = banca.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-GRADUACAO.TITULO
@@ -2788,7 +2789,7 @@
                 }      
             }
 
-            // criar string de todas pessoas na banca
+            // criando string de todas pessoas na banca
             participantes = participantes.join("; ")
             
             // destacar o nome que foi indicado
@@ -2803,7 +2804,7 @@
                 }
             }
 
-            // criar entrada final
+            // publicando content
             create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
@@ -2812,14 +2813,14 @@
     }
 
     if bancas_mestrado.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [== Mestrado <bancas_mestrado_graduacao>]
 
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_mestrado.len()
 
         for banca in bancas_mestrado {
-            // criar entradas
+            // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO.NOME-DO-CANDIDATO
             let titulo = banca.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO.TITULO
@@ -2846,7 +2847,7 @@
                 }      
             }
 
-            // criar string de todas pessoas na banca
+            // criando string de todas pessoas na banca
             participantes = participantes.join("; ")
 
             // destacar o nome que foi indicado
@@ -2861,7 +2862,7 @@
                 }
             }
 
-            // criar entrada final
+            // publicando content
             create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
@@ -2871,14 +2872,14 @@
     
     // TODO: Não tenho certeza sobre o key! Provavelmente dê erro
     if bancas_doutorado.len() > 0 {
-        // criar cabeçalho
+        // criando cabeçalho
         [== Doutorado <bancas_conclusao_doutorado>]
 
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_doutorado.len()
 
         for banca in bancas_doutorado {
-            // criar entradas
+            // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-DOUTORADO.NOME-DO-CANDIDATO
             let titulo = banca.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-DOUTORADO.TITULO
@@ -2904,7 +2905,7 @@
                 }      
             }
 
-            // criar string de todas pessoas na banca
+            // criando string de todas pessoas na banca
             participantes = participantes.join("; ")
 
             if not me == none {
@@ -2918,7 +2919,7 @@
                 }
             }
 
-            // criar entrada final
+            // publicando content
             create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
@@ -2927,9 +2928,8 @@
     }
 }
 
-// Criando a última página
-// A última página é um resumo de todas as informações
-// Argumentos
+// Função create-last-page(): Cria resumo de produções na última página
+// Argumentos:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
 //  - tipo_lattes: tipo de currículo Lattes
 #let create-last-page(detalhes, tipo_lattes) = {
@@ -2942,7 +2942,7 @@
     let livros = detalhes.PRODUCAO-BIBLIOGRAFICA.LIVROS-E-CAPITULOS.LIVROS-PUBLICADOS-OU-ORGANIZADOS.LIVRO-PUBLICADO-OU-ORGANIZADO
     let capitulos = detalhes.PRODUCAO-BIBLIOGRAFICA.LIVROS-E-CAPITULOS.CAPITULOS-DE-LIVROS-PUBLICADOS.CAPITULO-DE-LIVRO-PUBLICADO
     
-    // criar sub-categórias para apresentações
+    // criando sub-categórias para apresentações
     let apresentacoes = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.APRESENTACAO-DE-TRABALHO
 
     let conferencias = apresentacoes.filter(
@@ -2960,79 +2960,79 @@
         [#link(<producao_bibliografica>)[== Produção bibliográfica]]
     }
 
-    // Criar a soma de artigos
+    // criando a soma de artigos
     if artigos.len() > 0 {
         create-cols([#link(<publicacao_artigos>)[Artigos completos] #box(width: 1fr, repeat[.])], [#artigos.len()], "lastpage")
     }
     
-    // Criar a soma de livros
+    // criando a soma de livros
     if livros.len() > 0 {
         create-cols([#link(<publicacao_livros>)[Livros publicados #box(width: 1fr, repeat[.])]], [#livros.len()], "lastpage")
     }
     
-    // Criar a soma de capítulos
+    // criando a soma de capítulos
     if capitulos.len() > 0 {
         create-cols([#link(<publicacao_capitulos>)[Capítulos de livros publicados #box(width: 1fr, repeat[.])]], [#capitulos.len()], "lastpage")
     }
     
-    // Criar a soma de apresentações: Conferências
+    // criando a soma de apresentações: Conferências
     if tipo_lattes == "completo" {
         if conferencias.len() > 0 {
             create-cols([#link(<producao_apresentacoes>)[Apresentações de trabalhos (Conferência ou palestra) #box(width: 1fr, repeat[.])]], [#conferencias.len()], "lastpage")
         }  
 
-        // Criar a soma de apresentações: Congressos
+        // criando a soma de apresentações: Congressos
         if congressos.len() > 0 {
             create-cols([#link(<producao_apresentacoes>)[Apresentações de trabalhos (Congresso) #box(width: 1fr, repeat[.])]], [#congressos.len()], "lastpage")
         }
         
-        // Criar a soma de apresentações: Seminários
+        // criando a soma de apresentações: Seminários
         if seminarios.len() > 0 {
             create-cols([#link(<producao_apresentacoes>)[Apresentações de trabalhos (Seminário) #box(width: 1fr, repeat[.])]], [#seminarios.len()], "lastpage")
         }
     }     
     
     // Producao tecnica
-    // Criar bancos de dados
+    // criando bancos de dados
     let cursos_curtos = ()
     // TODO: Create cursos_curtos
     let didaticos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL
     let relatorios = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.RELATORIO-DE-PESQUISA
 
-    // Criar cabeçalho
+    // criando cabeçalho
     if cursos_curtos.len() > 0 or didaticos.len() > 0 or relatorios.len() > 0 {
         [#link(<producao_tecnica>)[== Produção técnica]]
     }
     
-    // criar soma de cursos curtos
+    // criando soma de cursos curtos
     if cursos_curtos.len() > 0 {
         create-cols([#link(<ensino_atuacao>)[Curso de curta duração ministrado #box(width: 1fr, repeat[.])]], [#cursos_curtos.len()], "lastpage")
     }
     
-    // criar soma de materiais didáticos
+    // criando soma de materiais didáticos
     if didaticos.len() > 0 {
         create-cols([#link(<producao_tecnica_demais>)[Desenvolvimento de material didático ou instrucional #box(width: 1fr, repeat[.])]], [#didaticos.len()], "lastpage")
     }
     
-    // criar soma de relatórios
+    // criando soma de relatórios
     if relatorios.len() > 0 {
         create-cols([#link(<producao_tecnica_demais>)[Relátorio de pesquisa #box(width: 1fr, repeat[.])]], [#relatorios.len()], "lastpage")
     }
     
     // Orientacoes
-    // Criar banca de dados
+    // criando banca de dados
     let orientacoes = detalhes.OUTRA-PRODUCAO
     
-    // criar cabeçalho
+    // criando cabeçalho
     if "ORIENTACOES-EM-ANDAMENTO" in orientacoes.keys() {
         [#link(<orientacao>)[== Orientações]]
     } else if "ORIENTACOES-CONCLUIDAS" in orientacoes.keys() {
         [#link(<orientacao>)[== Orientações]]
     }
 
-    // Criar bancos de dados para supervisões em andamento
+    // criando bancos de dados para supervisões em andamento
     // TODO: não tenho certeza sobre a chave, não a encontrei no meu banco de dados
-    // criar banco de dados total e entradas
+    // criando banco de dados total e entradas
     let andamentos = ()
     if "ORIENTACOES-EM-ANDAMENTO" in orientacoes {
         andamentos = orientacoes.ORIENTACOES-EM-ANDAMENTO
@@ -3078,34 +3078,34 @@
         }
 
         // TODO: ainda não sei a chave correta, provavelmente precisarei corrigir quando tiver uma entrada
-        // Criar campo se o comprimento for maior que 0 (orientador doutorado)
+        // criando campo se o comprimento for maior que 0 (orientador doutorado)
         if doutorado_andamento_orientador > 0 {
             create-cols([#link(<orientacao_andamento_doutorado_orientador>)[Orientação em andamento (tese de doutorado - orientador)] #box(width: 1fr, repeat[.])], [#doutorado_andamento_orientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (co-orientador doutorado)
+        // criando campo se o comprimento for maior que 0 (co-orientador doutorado)
         if doutorado_andamento_coorientador > 0 {
             create-cols([#link(<orientacao_andamento_doutorado_coorientador>)[Orientação em andamento (tese de doutorado - co-orientador) #box(width: 1fr, repeat[.])]], [#mestrado_andamento_coorientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (orientador mestrado)
+        // criando campo se o comprimento for maior que 0 (orientador mestrado)
         if mestrado_andamento_orientador > 0 {
             create-cols([#link(<orientacao_andamento_mestrado_orientador>)[Orientação em andamento (dissertação de mestrado - orientador) #box(width: 1fr, repeat[.])]], [#mestrado_andamento_orientador], "lastpage")
         }
         
-        // Criar campo se o comprimento for maior que 0 (co-orientador doutorado)
+        // criando campo se o comprimento for maior que 0 (co-orientador doutorado)
         if mestrado_andamento_coorientador > 0 {
             create-cols([#link(<orientacao_andamento_mestrado_coorientador>)[Orientação em andamento (dissertação de mestrado - co-orientador) #box(width: 1fr, repeat[.])]], [#mestrado_andamento_coorientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (graduacao)
+        // criando campo se o comprimento for maior que 0 (graduacao)
         if graduacao_andamento > 0 { 
             create-cols([#link(<orientacao_andamento_graduacao>)[Orientação em andamento (trabalho de conclusão de curso de graduação) #box(width: 1fr, repeat[.])]], [#graduacao_andamento], "lastpage")
         }
     }
 
     // Orientações concluídas
-    // criar banco de dados total e entradas
+    // criando banco de dados total e entradas
     let concluidas = ()
 
     if "ORIENTACOES-CONCLUIDAS" in orientacoes {
@@ -3119,7 +3119,7 @@
             graduacao_concluidas = concluidas.OUTRAS-ORIENTACOES-CONCLUIDAS.len()
         }
 
-        // Criar bancos de dados
+        // criando bancos de dados
         let mestrado_concluidas_orientador = 0
         let mestrado_concluidas_coorientador = 0
         
@@ -3151,34 +3151,34 @@
         }
 
         // TODO: não tenho certeza sobre a chave acima, provavelmente há um erro aqui e preciso corrigir a chave acima
-        // Criar campo se o comprimento for maior que 0 (orientador doutorado)
+        // criando campo se o comprimento for maior que 0 (orientador doutorado)
         if doutorado_concluidas_orientador > 0 {
             create-cols([#link(<orientacao_concluida_doutorado_orientador>)[Orientação concluída (tese de doutorado - orientador) #box(width: 1fr, repeat[.])]], [#doutorado_concluidas_orientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (co-orientador doutorado)
+        // criando campo se o comprimento for maior que 0 (co-orientador doutorado)
         if doutorado_concluidas_coorientador > 0 {
             create-cols([#link(<orientacao_concluida_doutorado_coorientador>)[Orientação concluída (tese de doutorado - co-orientador) #box(width: 1fr, repeat[.])]], [#mestrado_concluidas_coorientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (orientador mestrado)
+        // criando campo se o comprimento for maior que 0 (orientador mestrado)
         if mestrado_concluidas_orientador > 0 {
             create-cols([#link(<orientacao_concluida_mestrado_orientador>)[Orientação concluída (dissertação de mestrado - orientador) #box(width: 1fr, repeat[.])]], [#mestrado_concluidas_orientador], "lastpage")
         }
 
-        // Criar campo se o comprimento for maior que 0 (co-orientador mestrado)
+        // criando campo se o comprimento for maior que 0 (co-orientador mestrado)
         if mestrado_concluidas_coorientador > 0 {
             create-cols([#link(<orientacao_concluida_mestrado_coorientador>)[Orientação concluída (dissertação de mestrado - co-orientador) #box(width: 1fr, repeat[.])]], [#mestrado_concluidas_coorientador], "lastpage")
         }
 
         //TODO: não tenho certeza sobre o key que usei acima, provavelmente dê erro
-        // Criar campo se o comprimento for maior que 0 (graduação)
+        // criando campo se o comprimento for maior que 0 (graduação)
         if graduacao_concluidas > 0 { 
             create-cols([#link(<orientacao_concluida_graduacao>)[Orientação concluída (trabalho de conclusão de curso de graduação) #box(width: 1fr, repeat[.])]], [#graduacao_concluidas], "lastpage")
         }
     
         // Eventos
-        // Criar cabeçalho se um dos dois estiver pelo menos nos dados
+        // criando cabeçalho se um dos dois estiver pelo menos nos dados
         // se tem entradas, vai seguir para criar as entradas
         if tipo_lattes == "completo" {
             if "PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO" in detalhes.DADOS-COMPLEMENTARES.keys() or "PARTICIPACAO-EM-EVENTOS-CONGRESSOS" in detalhes.DADOS-COMPLEMENTARES.keys(){
@@ -3186,10 +3186,10 @@
                 
                 // se tiver entradas para participações em eventos
                 if "PARTICIPACAO-EM-EVENTOS-CONGRESSOS" in detalhes.DADOS-COMPLEMENTARES.keys() {
-                    // criar banco de dados
+                    // criando banco de dados
                     let eventos = detalhes.DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS
 
-                    // criar variável para soma para cada tipo
+                    // criando variável para soma para cada tipo
                     let congressos2 = 0
                     let simposios = 0
                     let encontros = 0
@@ -3211,24 +3211,24 @@
                     }
 
                 // somente se estiver "completo"
-                // Criar campo se o comprimento for maior que 0 (congressos)
+                // criando campo se o comprimento for maior que 0 (congressos)
                 
 
                     if congressos2 > 0 { 
                         create-cols([#link(<eventos_participacao>)[Participações em eventos (Congresso) #box(width: 1fr, repeat[.])]], [#congressos2], "lastpage")
                     }
 
-                    // Criar campo se o comprimento for maior que 0 (simposios)
+                    // criando campo se o comprimento for maior que 0 (simposios)
                     if simposios > 0 { 
                         create-cols([#link(<eventos_participacao>)[Participações em eventos (Simpósios) #box(width: 1fr, repeat[.])]], [#simposios], "lastpage")
                     }
 
-                    // Criar campo se o comprimento for maior que 0 (encontros)
+                    // criando campo se o comprimento for maior que 0 (encontros)
                     if encontros > 0 { 
                         create-cols([#link(<eventos_participacao>)[Participações em eventos (Encontros) #box(width: 1fr, repeat[.])]], [#encontros], "lastpage")
                     }
 
-                    // Criar campo se o comprimento for maior que 0 (outras)
+                    // criando campo se o comprimento for maior que 0 (outras)
                     if outras > 0 { 
                         create-cols([#link(<eventos_participacao>)[Participações em eventos (Outras) #box(width: 1fr, repeat[.])]], [#outras], "lastpage")
                     }
@@ -3238,14 +3238,14 @@
             // trabalhos em bancas de conclusão
             // se tiver entradas em participação em bancas
             if "PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO" in detalhes.DADOS-COMPLEMENTARES.keys() {
-                // criar bancos
+                // criando bancos
                 let bancas = detalhes.DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO
 
                 // para graduação
                 // TODO: não tenho certeza sobre a chave
                 let bancas_graduacao = 0 
 
-                // criar soma de bancas de graduação
+                // criando soma de bancas de graduação
                 if "PARTICIPACAO-EM-BANCA-DE-GRADUACAO" in bancas.keys() {
                     bancas_graduacao = bancas.PARTICIPACAO-EM-BANCA-DE-GRADUACAO.len()
                 }
@@ -3253,7 +3253,7 @@
                 // para mestrado
                 let bancas_mestrado = 0 
 
-                // criar soma de bancas de mestrado
+                // criando soma de bancas de mestrado
                 if "PARTICIPACAO-EM-BANCA-DE-MESTRADO" in bancas.keys() {
                     bancas_mestrado = bancas.PARTICIPACAO-EM-BANCA-DE-MESTRADO.len()
                 }
@@ -3261,24 +3261,24 @@
                 // para doutorado
                 // TODO: não tenho certeza sobre a chave
                 let bancas_doutorado = 0 
-                // criar soma de bancas de doutorado
+                // criando soma de bancas de doutorado
                 if "PARTICIPACAO-EM-BANCA-DE-DOUTORADO" in bancas.keys() {
                     bancas_doutorado = bancas.PARTICIPACAO-EM-BANCA-DE-DOUTORADO.len()
                 }
 
-                // Criar entradas
-                // criar entrado para doutorado (se não estiver 0)
+                // criando entradas
+                // criando entrado para doutorado (se não estiver 0)
     
                 if bancas_doutorado > 0 { 
                     create-cols([#link(<bancas>)[Participação em banca de trabalhos de conclusão (doutorado) #box(width: 1fr, repeat[.])]], [#bancas_doutorado], "lastpage")
                 }
 
-                // criar entrado para mestrado (se não estiver 0)
+                // criando entrado para mestrado (se não estiver 0)
                 if bancas_mestrado > 0 { 
                     create-cols([#link(<bancas>)[Participação em banca de trabalhos de conclusão (mestrado) #box(width: 1fr, repeat[.])]], [#bancas_mestrado], "lastpage")
                 }
 
-                // criar entrado para graduação (se não estiver 0)
+                // criando entrado para graduação (se não estiver 0)
                 if bancas_graduacao > 0 { 
                     create-cols([#link(<bancas>)[Participação em banca de trabalhos de conclusão (graduação) #box(width: 1fr, repeat[.])]], [#bancas_graduacao], "lastpage")
                 }
