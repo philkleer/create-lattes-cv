@@ -112,6 +112,19 @@
     return [#formatted_authors]        
 }
 
+// Função replace-quotes(): substitui o código HTML &quot; com "
+// Argumento:
+// - texto: string para ver
+#let replace-quotes(texto) = {
+    let novo_texto = str
+    if type(texto) != str {
+        [O input precisa ser _string_]
+    } else {
+        novo_texto = texto.replace("&quot;", "\"")
+    }
+
+    return novo_texto
+}
 
 // Função create-identification(): Cria área de identificação
 // Argumentos:
@@ -278,8 +291,12 @@
         [= Prêmios e títulos <premios>]
         while i >= 0 {
             let ano_content = premios.at(i).ANO-DA-PREMIACAO
+            
+            let nome = premios.at(i).NOME-DO-PREMIO-OU-TITULO
 
-            let descricao_content = [#premios.at(i).NOME-DO-PREMIO-OU-TITULO, #emph(premios.at(i).NOME-DA-ENTIDADE-PROMOTORA)]
+            nome = replace-quotes(nome)
+
+            let descricao_content = [#nome, #emph(premios.at(i).NOME-DA-ENTIDADE-PROMOTORA)]
 
             // publicando content
             create-cols([*#ano_content*], [#descricao_content], "enum")
@@ -315,6 +332,7 @@
             let conhecimento = content
             let tempo_content = []
             let descricao_content = []
+            let palavras_chave = ()
 
             let curso = subset.NOME-CURSO
             let universidade = subset.NOME-INSTITUICAO
@@ -347,6 +365,20 @@
                 orientador = subset.NOME-DO-ORIENTADOR
             } else {
                 orientador = subset.NOME-COMPLETO-DO-ORIENTADOR
+            }
+
+            // criando lista de palavras-chave
+            if "PALAVRAS-CHAVE" in subset.keys() {
+                for word in subset.PALAVRAS-CHAVE.keys() {
+                    if subset.PALAVRAS-CHAVE.at(word) != "" {
+                        palavras_chave.push(subset.PALAVRAS-CHAVE.at(word))    
+                    }
+                }
+            }
+
+            // criando string de palavras-chave
+            if palavras_chave.len() > 0 {
+                palavras_chave = palavras_chave.join("; ")
             }
 
             // criando áreas de conhecimento
@@ -403,8 +435,15 @@
             }
             // criando conteúdo depende do tipo de lattes
             if tipo_lattes == "completo" {
-                if conhecimento != content {
-                    descricao_content = [#descricao_content#linebreak()#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
+                // Caso: tem palavras-chave e conhecimento
+                if palavras_chave.len() > 0 and conhecimento != content {
+                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: " + palavras_chave)#linebreak()#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
+                // caso: só tem conhecimento
+                } else if palavras_chave.len() < 1 and conhecimento != content {
+                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
+                // Caso: só tem palavras-chave
+                } else if palavras_chave.len() > 0 and conhecimento == content {
+                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: " + palavras_chave)]
                 }
             } 
 
@@ -488,29 +527,32 @@
             let vinculo = str(position.TIPO-DE-VINCULO.slice(0,1) + lower(position.TIPO-DE-VINCULO.slice(1)))
             let enquadramento = position.OUTRO-ENQUADRAMENTO-FUNCIONAL-INFORMADO
             let horas = position.CARGA-HORARIA-SEMANAL
-            let informations = position.OUTRAS-INFORMACOES
+            let informacao = position.OUTRAS-INFORMACOES
+
+            // corrigindo o código html de &quot; para "
+            informacao = replace-quotes(informacao)
 
             // criando content depende das informações dados
             let descricao_content
-            if enquadramento != "" and horas != "" and informations != "" {
+            if enquadramento != "" and horas != "" and informacao != "" {
                 // caso tudo é dado
                 descricao_content = [
-                    Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros Informações: #informations]
+                    Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros informações: #informacao]
                 ]
-            } else if enquadramento != "" and horas != "" and informations == "" {
+            } else if enquadramento != "" and horas != "" and informacao == "" {
                 // caso sem informações
                 descricao_content = [
                     Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas
                 ]
-            } else if enquadramento != "" and horas == "" and informations == "" {
+            } else if enquadramento != "" and horas == "" and informacao == "" {
                 // caso sem informações e horas
                 descricao_content = [
                     Vínculo: #vinculo, Enquadramento funcional: #enquadramento
                 ]
-            } else if enquadramento != "" and horas == "" and informations != "" {
+            } else if enquadramento != "" and horas == "" and informacao != "" {
                 // caso sem horas
                 descricao_content = [
-                    Vínculo: #vinculo, Enquadramento funcional: #enquadramento #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros Informações: #informations]
+                    Vínculo: #vinculo, Enquadramento funcional: #enquadramento #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros informações: #informacao]
                 ]
             }
 
@@ -535,29 +577,31 @@
         let vinculo = [#dados_vagas.TIPO-DE-VINCULO.slice(0,1) #lower(dados_vagas.TIPO-DE-VINCULO.slice(1))]
         let enquadramento = dados_vagas.OUTRO-ENQUADRAMENTO-FUNCIONAL-INFORMADO
         let horas = dados_vagas.CARGA-HORARIA-SEMANAL
-        let informations = dados_vagas.OUTRAS-INFORMACOES
+        let informacao = dados_vagas.OUTRAS-INFORMACOES
+
+        informacao = replace-quotes(informacao)
 
         // criando content
         let descricao_content = []
-        if enquadramento != "" and horas != "" and informations != "" {
+        if enquadramento != "" and horas != "" and informacao != "" {
             // case all three are given
             descricao_content = [
-                Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros Informações: #informations]
+                Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros informações: #informacao]
             ]
-        } else if enquadramento != "" and horas != "" and informations == "" {
+        } else if enquadramento != "" and horas != "" and informacao == "" {
             // caso sem informações
             descricao_content = [
                 Vínculo: #vinculo, Enquadramento funcional: #enquadramento, Carga horária: #horas
             ]
-        } else if enquadramento != "" and horas == "" and informations == "" {
+        } else if enquadramento != "" and horas == "" and informacao == "" {
             // caso sem informações e horas
             descricao_content = [
                 Vínculo: #vinculo, Enquadramento funcional: #enquadramento
             ]
-        } else if enquadramento != "" and horas == "" and informations != "" {
+        } else if enquadramento != "" and horas == "" and informacao != "" {
             // caso sem horas
             descricao_content = [
-                Vínculo: #vinculo, Enquadramento funcional: #enquadramento #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros Informações: #informations]
+                Vínculo: #vinculo, Enquadramento funcional: #enquadramento #linebreak() #text(rgb("B2B2B2"), size: 0.85em)[Outros informações: #informacao]
             ]
         }
 
@@ -823,6 +867,10 @@
                     producoes = subset.PRODUCOES-CT-DO-PROJETO.PRODUCAO-CT-DO-PROJETO.len()
                 }
 
+                // criando outras informações
+                let informacao = subset.DESCRICAO-DO-PROJETO
+                informacao = replace-quotes(informacao)
+                
                 // criando content
                 let descricao_content = [
                     #subset.NOME-DO-PROJETO
@@ -831,7 +879,7 @@
                     #linebreak()
                     #text(rgb("B2B2B2"), size: 0.85em, "Número de produções C,T & A: " + str(producoes))
                     #linebreak()
-                    #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + subset.DESCRICAO-DO-PROJETO)
+                    #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + informacao)
                 ]
 
                 // publicando content
@@ -890,6 +938,9 @@
                     producoes = subset.PRODUCOES-CT-DO-PROJETO.PRODUCAO-CT-DO-PROJETO.len()
                 }
 
+                // criando outras informações
+                let informacao = subset.DESCRICAO-DO-PROJETO
+                informacao = replace-quotes(informacao)
                 // criando content
                 let descricao_content = [
                     #subset.NOME-DO-PROJETO
@@ -898,7 +949,7 @@
                     #linebreak()
                     #text(rgb("B2B2B2"), size: 0.85em, "Número de produções C,T & A: " + str(producoes))
                     #linebreak()
-                    #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + subset.DESCRICAO-DO-PROJETO)
+                    #text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + informacao)
                 ]
 
                 // publicando content
@@ -1015,14 +1066,17 @@
             // extrair mais informações se tiver
             let informacao = []
             if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
-                informacao = text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + entrada.VINCULOS.OUTRAS-INFORMACOES)
+                let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
+                texto = replace-quotes(texto)
+
+                informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
             }
 
             // criando content
-            let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
+            let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
             
             // publicando content
-            // publicando[*#tempo_content*], descricao_content, "small")
+            create-cols([*#tempo_content*], descricao_content, "small")
 
         }
 
@@ -1058,15 +1112,19 @@
 
             // extrair mais informações se tiver
             let informacao = []
+
             if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
-                informacao = text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + entrada.VINCULOS.OUTRAS-INFORMACOES)
+                let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
+                texto = replace-quotes(texto)
+
+                informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
             }
 
             // criando content
-            let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
+            let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
             
             // publicando content
-            // publicando[*#tempo_content*], descricao_content, "small")
+            create-cols([*#tempo_content*], descricao_content, "small")
 
         }
 
@@ -1131,7 +1189,7 @@
             }
 
             // publicando content
-            // publicando[*#i. *], [#descricao_content], "enum")
+            create-cols([*#i. *], [#descricao_content], "enum")
             
             // aumentar número para ordem
             i += 1
@@ -1142,7 +1200,7 @@
     line(length: 100%)
 }
 
-// Função create-technical: Cria área de produções técnicos (usado em create-bibliography)
+// Função create-technicals(): Cria área de produções técnicos (usado em create-bibliography)
 // TODO: Até agora somente categoria "demais produções técnicos"
 // Argumentos:
 //  - dados_tecnicos: subset do banco de dados com só técnios
@@ -1265,11 +1323,11 @@
             descricao_content = [#autores #titulo. #ano (#tipo). #url_link]
         }
         
+        // publicando content
+        create-cols([*#i*], [#descricao_content], "enum")
+        
         // diminuir número (ordem)
         i -= 1
-
-        // publicando content
-        // publicando[*#i*], [#descricao_content], "enum")
     }
 }
 
@@ -1878,6 +1936,8 @@
             let titulo = subset.NOME-DO-PROJETO
             let informacao = subset.DESCRICAO-DO-PROJETO
 
+            // corrigindo quotes em código HTML
+            informacao = replace-quotes(informacao)
 
             if subset.SITUACAO != "CONCLUIDO" {
                 ano = [#project.ANO-INICIO - atual]
@@ -1997,9 +2057,12 @@
             let membros = ()
             let subvencoes = ()
             let cta = 0
-
-            let informacao = subset.DESCRICAO-DO-PROJETO
             let titulo = subset.NOME-DO-PROJETO
+            let informacao = subset.DESCRICAO-DO-PROJETO
+
+            // corrigindo quotes em código HTML
+            informacao = replace-quotes(informacao)
+
 
             if subset.SITUACAO != "CONCLUIDO" {
                 ano = [#projeto.ANO-INICIO - atual]
