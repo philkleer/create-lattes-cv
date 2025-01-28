@@ -187,7 +187,8 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Orientações e Supervisões - concluídas - Supervisão de pós-doutorado | ⛔️ | 🧐 | 🧐 | 🧐 | |
 | Orientações e Supervisões - concluídas - orientação de outra natureza | ⛔️ | 🧐 | 🧐 | 🧐 | |
 | **Eventos** | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES` |
-| Eventos - Participação em eventos | 🎬 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS` |
+| Eventos - Participação em eventos, congressos, exposições, feiras e olimpíadas | 🎬 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS` |
+| Eventos - Organização de eventos, congressos, exposições, feiras e olimpíadas | ⛔️ | 🧐 | 🧐 | 🧐 | |
 | **Bancas** | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES` |
 | Bancas - Participação em banca de trabalhos de conclusão | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO` |
 | Bancas - Participação em banca de trabalhos de conclusão - graduação (not tested) | 👷🏼 |  ✅ |  ❌ | ❌ |`DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO.PARTICIPACAO-EM-BANCA-DE-GRADUACAO` |
