@@ -869,7 +869,7 @@
 
             // TODO: não tenho certeza sobre o key
             // criando array para outros tipos de projetos
-            projetos_OUTROS = projetos.filter(
+            projetos_outros = projetos.filter(
                 entry => entry.at("PROJETO-DE-PESQUISA").NATUREZA == "OUTROS_PROJETOS"
             )
         }
@@ -2541,6 +2541,8 @@
         // Projetos primeiro
         // TODO; does not work
         if proj_pesquisa.len() > 0 or proj_ensino.len() > 0 {
+            [== Projetos <projetos_inovacao>]
+
             create-projects-ct(proj_pesquisa, proj_ensino)    
         }   
     }
