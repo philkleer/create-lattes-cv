@@ -72,7 +72,7 @@
     align(top + left)[
         #text(20pt, author, weight: "bold", fill: rgb("B2B2B2"))
 
-        #text(subtitle, weight: "regular")
+        #text(subtitle + " (" + kind + ")", weight: "regular")
     ]
 
     line(length: 100%)
