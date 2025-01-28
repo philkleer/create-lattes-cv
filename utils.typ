@@ -617,9 +617,50 @@
     [== Atividades (Ensino) <ensino_atuacao>]
 
     if type(dados_ensino) == dictionary {
-        
+    // case only one entry
+        // criando variáveis
+        let disciplinas_text = str
+        let tempo_content = []
+
+        // criando tempo_content
+        if data_ensino.FLAG-PERIODO == "ATUAL" {
+            tempo_content = [#data_ensino.MES-INICIO/#data_ensino.ANO-INICIO - atual]
+        } else {
+            tempo_content = [#data_ensino.MES-INICIO/#data_ensino.ANO-INICIO - #data_ensino.MES-FIM/#data_ensino.ANO-FIM]
+        }
+
+        // criando nível
+            let nivel = str(data_ensino.TIPO-ENSINO.slice(0, 1) + lower(data_ensino.TIPO-ENSINO.slice(1)))
+
+            // corrigir nível
+            if nivel == "Graduacao" {
+                nivel = "Graduação"
+            } else if nivel == "Pos-graduacao" {
+                nivel = "Pós-Graduação"
+            }
+
+            if "DISCIPLINA" in data_ensino.keys() {
+                let disciplinas = data_ensino.at("DISCIPLINA")
+                
+                let ministradas = ()
+
+                for area in disciplinas { 
+                    ministradas.push(area._text)
+                }
+
+                disciplinas_text = ministradas.join("; ")
+
+                disciplinas_text = "Disciplinas ministradas: " + disciplinas_text
+            }
+                
+            let descricao_content = [#nivel, #data_ensino.NOME-CURSO #linebreak()#text(rgb("B2B2B2"), size: 0.85em, disciplinas_text)]
+
+            // publicando content
+            create-cols([*#tempo_content*], [#descricao_content], "wide")
+            
+    // case more than one entry
     } else if type(dados_ensino) == array {
-        for curso in dados_ensino {
+        for curso in dados_ensino.rev() {
             // criando variáveis
             let disciplinas_text = str
             let tempo_content = []
@@ -695,7 +736,7 @@
     } else if type(dados_comissoes) == array {
         [== Atividades (Comissões) <comissoes_atuacao>]
         
-        for posicao in dados_comissoes {
+        for posicao in dados_comissoes.rev() {
             if posicao.FLAG-PERIODO == "ATUAL" {
                 tempo_content = [#posicao.MES-INICIO/#posicao.ANO-INICIO - atual]
             } else {
