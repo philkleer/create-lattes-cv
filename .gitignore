@@ -2,3 +2,6 @@ trials/
 references/
 *.DS_Store
 *.pdf
+
+# para testes
+test.typ
