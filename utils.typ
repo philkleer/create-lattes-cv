@@ -333,6 +333,7 @@
             let tempo_content = []
             let descricao_content = []
             let palavras_chave = ()
+            let conhecimento = ()
 
             let curso = subset.NOME-CURSO
             let universidade = subset.NOME-INSTITUICAO
@@ -404,8 +405,8 @@
                     }
                 }
 
-                if all_areas.len() == 0 {} else {
-                    conhecimento = [Áreas de conhecimento: #all_areas.join(", ")]
+                if all_areas.len() != 0 {
+                    conhecimento = all_areas.join(", ")
                 }
             }
 
@@ -433,19 +434,25 @@
                     Título: #titulo#linebreak()
                 ]
             }
+
             // criando conteúdo depende do tipo de lattes
             if tipo_lattes == "completo" {
-                // Caso: tem palavras-chave e conhecimento
-                if palavras_chave.len() > 0 and conhecimento != content {
-                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: " + palavras_chave)#linebreak()#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
-                // caso: só tem conhecimento
-                } else if palavras_chave.len() < 1 and conhecimento != content {
-                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, conhecimento)]
-                // Caso: só tem palavras-chave
-                } else if palavras_chave.len() > 0 and conhecimento == content {
-                    descricao_content = [#descricao_content#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: " + palavras_chave)]
-                }
-            } 
+                // criando content para palavras-chave
+                let palavras_content = []
+                if palavras_chave.len() > 0 {
+                    palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
+                } 
+                    
+                // criando content para áreas de conhecimento 
+                let areas_content = [] 
+                if conhecimento.len() > 0 {
+                    areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
+                } 
+
+                descricao_content = [#descricao_content #palavras_content #areas_content]
+            } else {
+                descricao_content = [#descricao_content]
+            }           
 
             // publicando content
             create-cols([*#tempo_content*], [#descricao_content], "small")
@@ -1668,17 +1675,13 @@
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-        } else {
-            palavras_content = []
-        }
+        } 
             
         // criando content para áreas de conhecimento 
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
-        } else {
-            areas_content = []
-        }
+        } 
 
         // criando link, se tem DOI, somente usar doi e não homepage
         if doi != "" { 
@@ -2597,10 +2600,10 @@
     line(length: 100%)
 }
 
-// Função create-ct-apresentacoes(): Cria subárea de apresentações dentro da área Educação e Popularização C&T
+// Função create-ct-presentations(): Cria subárea de apresentações dentro da área Educação e Popularização C&T
 // Argumento:
 //  - dados_apresentacoes: o banco de dados com apresentações
-#let create-ct-apresentacoes(dados_apresentacoes) = {
+#let create-ct-presentations(dados_apresentacoes, eu) = {
     [=== Apresentação de trabalho e palestra <ct_apresentacoes>]
             
     // criando números para oddem
@@ -2615,17 +2618,78 @@
         let evento = entrada.DETALHAMENTO-DA-APRESENTACAO-DE-TRABALHO.NOME-DO-EVENTO
         let ano = subset.ANO
         let titulo = subset.TITULO
+        let palavras_chave = ()
+        let conhecimento = () 
+
+        // formatando os autores
+        let autores = format_authors(entrada.AUTORES, eu)     
+
+        // 
         let natureza = str(subset.NATUREZA.slice(0, 1) + lower(subset.NATUREZA.slice(1)))
 
-        // corrigir natureza
+        // corrigindo natureza
         if natureza == "Conferencia" {
             natureza = "Conferência ou Palestra"
         } else if natureza == "Seminario" {
             natureza = "Seminário"
         }
-                            
+        
+        // criando lista de palavras-chave
+        if "PALAVRAS-CHAVE" in subset.keys() {
+            for word in subset.PALAVRAS-CHAVE.keys() {
+                if subset.PALAVRAS-CHAVE.at(word) != "" {
+                    palavras_chave.push(subset.PALAVRAS-CHAVE.at(word))    
+                }
+            }
+        }
+
+        // criando string de palavras-chave
+        if palavras_chave.len() > 0 {
+            palavras_chave = palavras_chave.join("; ")
+        }
+
+        // criando áreas de conhecimento
+        if "AREAS-DO-CONHECIMENTO" in subset.keys() {
+            let areas = subset.at("AREAS-DO-CONHECIMENTO")
+
+            let all_areas = ()
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset2 = areas.at(key)
+
+                // first check lowest unit, then go up
+                if subset2.NOME-DA-ESPECIALIDADE != "" {
+                    all_areas.push(subset2.NOME-DA-ESPECIALIDADE)
+                } else if subset2.NOME-DA-SUB-AREA-DO-CONHECIMENTO != "" {
+                    all_areas.push(subset2.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
+                } else if subset2.NOME-DA-AREA-DO-CONHECIMENTO != "" {
+                    all_areas.push(subset2.NOME-DA-AREA-DO-CONHECIMENTO)
+                } else if subset2.NOME-GRANDE-AREA-DO-CONHECIMENTO != "" {
+                    all_areas.push(subset2.NOME-GRANDE-AREA-DO-CONHECIMENTO)
+                }
+            }
+
+            if all_areas.len() == 0 {} else {
+                conhecimento = [Áreas de conhecimento: #all_areas.join(", ")]
+            }
+        }
+
+        // criando content para palavras-chave
+        let palavras_content = []
+        if palavras_chave.len() > 0 {
+            palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
+        } 
+            
+        // criando content para áreas de conhecimento 
+        let areas_content = [] 
+        if conhecimento.len() > 0 {
+            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
+        } 
+
         // criando conteúdo 
-        let descricao_content = [#strong(evento), #ano (#natureza). #titulo]
+        let descricao_content = [#autores #titulo, #emph(evento), #ano (#natureza). #linebreak() #palavras_content #areas_content]
 
         // publicando content
         create-cols([*#i.*], [#descricao_content], "enum")
@@ -2640,7 +2704,7 @@
 // TODO: até agora somente apresentação de trabalho e palestra
 // Argumento:
 //  - detalhes: banco de dados de Lattes (em formato de TOML)
-#let create-education-ct(detalhes) = {
+#let create-education-ct(detalhes, eu) = {
 
     // Dados de congressos não são vinculados com a atuação
     // criando banco de dados
@@ -2667,7 +2731,7 @@
 
     // entradas de apresentações
     if congressos.len() > 0 {
-        create-ct-apresentacoes(congressos)
+        create-ct-presentations(congressos, eu)
     }
 
     linebreak()
@@ -3139,7 +3203,7 @@
                 let titulo = subset.TITULO
 
                 // criando texto
-                descricao_content = [#tipo em #strong(evento), #ano (#natureza). #titulo]
+                descricao_content = [#tipo em #text(evento, weight: "semibold"), #ano (#natureza). #emph(titulo)]
 
                 // publicando content
                 create-cols([*#i.*], [#descricao_content], "enum")
