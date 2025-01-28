@@ -3072,6 +3072,8 @@
     // TODO: Não tenho certeza sobre o key
     if "PARTICIPACAO-EM-BANCA-DE-GRADUACAO" in bancas.keys() {
         bancas_graduacao = bancas.PARTICIPACAO-EM-BANCA-DE-GRADUACAO
+
+        bancas_graduacao = bancas_graduacao.sorted(key: (item) => (item.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-GRADUACAO.ANO))
     } else {
         bancas_graduacao = (:)
     }
@@ -3079,6 +3081,8 @@
     // para mestrado
     if "PARTICIPACAO-EM-BANCA-DE-MESTRADO" in bancas.keys() {
         bancas_mestrado = bancas.PARTICIPACAO-EM-BANCA-DE-MESTRADO
+
+        bancas_mestrado = bancas_mestrado.sorted(key: (item) => (item.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO.ANO))
     } else {
         bancas_mestrado = (:)
     }
@@ -3087,6 +3091,8 @@
     // TODO: Não tenho certeza sobre o key
     if "PARTICIPACAO-EM-BANCA-DE-DOUTORADO" in bancas.keys() {
         bancas_doutorado = bancas.PARTICIPACAO-EM-BANCA-DE-DOUTORADO
+
+        bancas_doutorado = bancas_doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO.ANO))
     } else {
         bancas_doutorado = (:)
     }
@@ -3106,7 +3112,7 @@
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_graduacao.len()
 
-        for banca in bancas_graduacao {
+        for banca in bancas_graduacao.rev() {
             // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-GRADUACAO.NOME-DO-CANDIDATO
@@ -3163,7 +3169,7 @@
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_mestrado.len()
 
-        for banca in bancas_mestrado {
+        for banca in bancas_mestrado.rev() {
             // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO.NOME-DO-CANDIDATO
@@ -3222,7 +3228,7 @@
         // Para ordem decrescente (vantagem: na primeira entrada você pode ver quantas ações uma pessoa fez)
         let i = bancas_doutorado.len()
 
-        for banca in bancas_doutorado {
+        for banca in bancas_doutorado.rev() {
             // criando entradas
             let participantes = ()
             let candidato = banca.DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-DOUTORADO.NOME-DO-CANDIDATO
