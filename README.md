@@ -97,7 +97,7 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 | Produção bibliográfica - capítulos de livros | 🎬 |  ✅ |  ✅ |  ✅ |
 | Produção bibliográfica - texto em jornal ou revista | ⛔️ | ✅ | ✅ | ✅ |
 | Produção bibliográfica - Apresentações de trabalho e palestra | 🎬 |  ✅ |  ❌ | ❌ |
-| Produção bibliográfica - Técnicos (somente _Demais produções técnicas_ ) | 👷🏼 |  ✅ |  ❌ | ✅ |
+| Produção bibliográfica - Técnicos (somente _Demais produções técnicas_ ) | 👷🏼 |  ✅ |  ✅ | ✅ |
 | **Assessoria** | ⛔️ | ✅ | ❌ | ❌ |
 | **Extensão tecnológica** |  ⛔️ | ✅ | ❌ | ❌ |
 | **Programa de computador sem registro** | ⛔️ | ✅ | ✅ | ✅ |
@@ -145,6 +145,3 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 ![LATTES CV 4](assets/pagina-4.png)
 
 ![LATTES CV 5](assets/pagina-5.png)
-
-![LATTES CV 6](assets/pagina-6.png)
-
