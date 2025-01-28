@@ -114,6 +114,8 @@
     // Área de inovação
     if kind == "completo" {
         create-innovations(details)
+
+        create-education-ct(details)
     }
     
     // Área de orientações e supervisões
