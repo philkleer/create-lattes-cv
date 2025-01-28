@@ -4,15 +4,15 @@
 
 // create full CV
 // Argumentos:
-// -  kind: "completo", "ampliado" ou "resumido"
-// - me: string para destacar nas citações
-// - last_page: resumo de totais de produção (true ou false)
-// - database: link para o arquivo de toml.
-// - datetime: a data atual
+// - database: o arquivo de TOML com os dados de Lattes (string)
+// - kind: o tipo de currículo Lattes (string)
+// - me: o nome para destacar nas citações (string)
+// - data: a data de currículo
+// - last_page: resumo de produção no final (boolean)
 #show: lattes-cv.with(
+  database: "data/lattes.toml",
   kind: "completo",
   me: "KLEER",
-  last_page: true,
-  database: "data/lattes.toml",
-  date: datetime(year: 2022, month: 04, day: 07)
+  date: datetime.today()
+  last_page: true
 )   
