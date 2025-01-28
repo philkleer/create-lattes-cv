@@ -58,15 +58,19 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 
 ### O que já está incluído
 
-❌ : não incluído no tipo
-
-✅ : incluído no tipo
+#### Status de programar a área
 
 👷🏼 : precisa de trabalho (parcialmente codificado)
 
 🎬 : finalizado
 
 ⛔️ : ainda não é começado
+
+#### Inclusão no tipo de currículo
+
+❌ : não incluído no tipo
+
+✅ : incluído no tipo
 
 | Área | Coded? | Parte de tipo *completo* | Parte de tipo *ampliado* | Parte de tipo *resumido* | 
 | :---------------- | :--:| :--:| :--:| :--:|
