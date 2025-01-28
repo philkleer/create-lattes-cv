@@ -2535,53 +2535,6 @@
     // }
 // }
 
-
-// Função create-education-ct(): Cria área Educação e Popularização (parte da inovação, usado em create-innovations())
-// TODO: até agora somente apresentação de trabalho e palestra
-// Argumento:
-//  - dados_educacao_ct: subset para invoção - educação e popularização
-#let create-education-ct(dados_educacao_ct) = {
-    if dados_educacao_ct.len() > 0 {
-        // criando cabeçalho 
-        // TODO: até agora somente essa categoria, com mais categorias precisa mudar pra cima
-        [== Educação e Popularização de C&T <ct>]
-
-        [=== Apresentação de trabalho e palestra <ct_apresentacoes>]
-            
-        // criando números para oddem
-        let i = dados_educacao_ct.len()
-
-        for entrada in dados_educacao_ct.rev() {
-
-            // criando sub-banco de dados para cada entrada
-            let subset = entrada.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO
-            
-            // criando variáveis
-            let evento = entrada.DETALHAMENTO-DA-APRESENTACAO-DE-TRABALHO.NOME-DO-EVENTO
-            let ano = subset.ANO
-            let titulo = subset.TITULO
-            let natureza = str(subset.NATUREZA.slice(0, 1) + lower(subset.NATUREZA.slice(1)))
-
-            // corrigir natureza
-            if natureza == "Conferencia" {
-                natureza = "Conferência ou Palestra"
-            } else if natureza == "Seminario" {
-                natureza = "Seminário"
-            }
-                                
-            // criando conteúdo 
-            let descricao_content = [#strong(evento), #ano (#natureza). #titulo]
-
-            // publicando content
-            create-cols([*#i.*], [#descricao_content], "enum")
-
-            // diminuir número (para ordem)
-            i -= 1
-        }
-        // }
-    }
-}
-
 // Função create-innovations(): Cria Inovações 
 // Argumento:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
@@ -2639,14 +2592,63 @@
             create-projects-ct(proj_pesquisa, proj_ensino)    
         }   
     }
+    linebreak()
+
+    line(length: 100%)
+}
+
+// Função create-ct-apresentacoes(): Cria subárea de apresentações dentro da área Educação e Popularização C&T
+// Argumento:
+//  - dados_apresentacoes: o banco de dados com apresentações
+#let create-ct-apresentacoes(dados_apresentacoes) = {
+    [=== Apresentação de trabalho e palestra <ct_apresentacoes>]
+            
+    // criando números para oddem
+    let i = dados_apresentacoes.len()
+
+    for entrada in dados_apresentacoes.rev() {
+
+        // criando sub-banco de dados para cada entrada
+        let subset = entrada.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO
+        
+        // criando variáveis
+        let evento = entrada.DETALHAMENTO-DA-APRESENTACAO-DE-TRABALHO.NOME-DO-EVENTO
+        let ano = subset.ANO
+        let titulo = subset.TITULO
+        let natureza = str(subset.NATUREZA.slice(0, 1) + lower(subset.NATUREZA.slice(1)))
+
+        // corrigir natureza
+        if natureza == "Conferencia" {
+            natureza = "Conferência ou Palestra"
+        } else if natureza == "Seminario" {
+            natureza = "Seminário"
+        }
+                            
+        // criando conteúdo 
+        let descricao_content = [#strong(evento), #ano (#natureza). #titulo]
+
+        // publicando content
+        create-cols([*#i.*], [#descricao_content], "enum")
+
+        // diminuir número (para ordem)
+        i -= 1
+    }
+}
+
+
+// Função create-education-ct(): Cria área Educação e Popularização 
+// TODO: até agora somente apresentação de trabalho e palestra
+// Argumento:
+//  - detalhes: banco de dados de Lattes (em formato de TOML)
+#let create-education-ct(detalhes) = {
 
     // Dados de congressos não são vinculados com a atuação
     // criando banco de dados
     // educacao e popularizacao de C&T
-    eventos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA
+    let eventos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA
 
     // criando banco de dados de apresentações
-    congressos = eventos.APRESENTACAO-DE-TRABALHO
+    let congressos = eventos.APRESENTACAO-DE-TRABALHO
 
     // ordenar por ano 
     congressos = congressos.sorted(key: (item) => (item.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO.ANO, item.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO.TITULO))
@@ -2658,13 +2660,16 @@
     
     // somente criar se tiver uma entrada ao mínimo
     if congressos.len() > 0 {
-        if congressos.len() > 0 and marker == true {
-            [#marker]
-            [= Inovação <inovacao>]
-        }
-
-        create-education-ct(congressos)
+        // criando cabeçalho 
+        // TODO: até agora somente essa categoria, com mais categorias precisa mudar com conector or 
+        [== Educação e Popularização de C&T <ct>]
     }
+
+    // entradas de apresentações
+    if congressos.len() > 0 {
+        create-ct-apresentacoes(congressos)
+    }
+
     linebreak()
 
     line(length: 100%)
