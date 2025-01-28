@@ -33,12 +33,12 @@ A estrutura do arquivo principal é bastante simples. Você só precisa indicar 
 #import "@preview/datify:0.1.3": *
 
 #show: lattes-cv.with(
+  database: "data/lattes.toml",
   kind: "completo",
   me: "KLEER",
-  last_page: true,
-  database: "seu-caminho-para-o-arquivo/arquivo.toml",
-  date: datetime(year: 2022, month: 04, day: 07)
-)    
+  date: datetime.today()
+  last_page: true
+)     
 ```
 
 #### Uso de Typst local
@@ -46,7 +46,7 @@ A estrutura do arquivo principal é bastante simples. Você só precisa indicar 
 Antes de usar, você precisa instalar ou fazer update para Typst 0.12. Como você poderia instalar é descrevido [aqui](https://github.com/typst/typst).
 
 #### Uso no editor online de Typst
-Você poderia usar o editor online de [Typst](https://typst.app) para criar um projeto. Você poderia copiar esse projeto que já tem todos os arquivos (sem o arquivo criado do Lattes): [Link](https://typst.app/project/rDHeKkEoT9UuHDnnH93mQq)
+Você poderia usar o editor online de [Typst](https://typst.app) para criar um projeto. Você poderia copiar esse projeto que já tem todos os arquivos (sem o arquivo criado do Lattes): [Link](https://typst.app/project/rDHeKkEoT9UuHDnnH93mQq). Você poderia copiar o projeto para usar.
 
 Antes de executar, você somente precisa fazer o upload do arquivo transformado para `.toml` do Lattes. 
 
@@ -60,24 +60,27 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 
 ❌ : não incluído no tipo
 
-✅ : finalizado / incluído
+✅ : incluído no tipo
 
 👷🏼 : precisa de trabalho (parcialmente codificado)
 
 🎬 : finalizado
 
+⛔️ : ainda não é começado
+
 | Área | Coded? | Parte de tipo *completo* | Parte de tipo *ampliado* | Parte de tipo *resumido* | 
 | :---------------- | :--:| :--:| :--:| :--:|
 | **Identificação** |  🎬 | ✅ | ✅ | ✅ |
-| **Idiomas** | 🎬 | ✅ | ✅ | ✅ |
-| **Prêmios e títulos** (provavelmente nem todos tipos) |  👷🏼 | ✅ | ✅ | ✅ |
+| **Licenças** | ⛔️ | ✅ | ❌ | ❌ |
+| **Idiomas** | 🎬 | ✅ | ✅ | ❌ |
+| **Prêmios e títulos** (provavelmente nem todos tipos) |  👷🏼 | ✅ | ✅ | ❌ |
 | **Formação acadêmica** (provavelmente nem todos tipos) | 👷🏼 | ✅ | ✅ | ✅ |
 | **Formação complementar** |  🎬 |  ✅ |  ✅ |  ✅ |
 | **Atuação profissional** (talvez tenha mais tipos) | 👷🏼 |  ✅ |  ✅ |  ✅ |
 | Atuação profissional - Vínculos | 🎬 |  ✅ |  ✅ |  ✅ |
 | Atuação profissional - Vínculos - Atividades Comissões (provavelmente não todos tipos) | 👷🏼 |  ✅ |  ✅ |  ✅ |
 | Atuação profissional - Vínculos - Atividades Ensino (provavelmente não todos tipos) | 👷🏼 |  ✅ |  ✅ |  ✅ |
-| **Projetos** (talvez tenha mais tipos) | 👷🏼 |  ✅ |  ✅ |  ✅ |
+| **Projetos** (talvez tenha mais tipos) | 👷🏼 |  ✅ |  ❌ |  ❌ |
 | Projetos - Projetos de pesquisa |  🎬 |  ✅ |  ❌ | ❌ | 
 | Projetos - Projetos de ensino |  🎬 |  ✅ |  ❌ | ❌ | 
 | **Revisor periódico** | 🎬 |  ✅ |  ✅ |  ✅ |
@@ -88,12 +91,25 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 | Produção bibliográfica - artigos | 🎬 |  ✅ |  ✅ |  ✅ |
 | Produção bibliográfica - livros | 🎬 |  ✅ |  ✅ |  ✅ |
 | Produção bibliográfica - capítulos de livros | 🎬 |  ✅ |  ✅ |  ✅ |
+| Produção bibliográfica - texto em jornal ou revista | ⛔️ | ✅ | ✅ | ✅ |
 | Produção bibliográfica - Apresentações de trabalho e palestra | 🎬 |  ✅ |  ❌ | ❌ |
-| Produção bibliográfica - Técnicos (somente _Demais produções técnicas_ ) | 👷🏼 |  ✅ |  ❌ | ❌ |
-| **Inovação** | 👷🏼 | ✅ | ✅ | ✅ |
+| Produção bibliográfica - Técnicos (somente _Demais produções técnicas_ ) | 👷🏼 |  ✅ |  ❌ | ✅ |
+| **Assessoria** | ⛔️ | ✅ | ❌ | ❌ |
+| **Extensão tecnológica** |  ⛔️ | ✅ | ❌ | ❌ |
+| **Programa de computador sem registro** | ⛔️ | ✅ | ✅ | ✅ |
+| **Produtos** |  ⛔️ | ✅ | ✅ | ✅ |
+| **Processos** |  ⛔️ | ✅ | ✅ | ✅ |
+| **Trabalhos técnicos** |  ⛔️ | ✅ | ✅ | ✅ |
+| **Extensão tecnológica** |  ⛔️ | ✅ | ✅ | ✅ |
+| **Outras produções técnicas** |  ⛔️ | ✅ | ❌ | ❌ |
+| **Entrevistas, mesas redondas, programas e comentários na mídia** |  ⛔️ | ✅ | ❌ | ❌ |
+| **Redes sociais, websites, blogs** |  ⛔️ | ✅ | ✅ | ✅ |
+| **Produção artista/cultural** | ⛔️ | ✅ | ✅ | ✅ |
+| **Patentes e registros** | ⛔️ | ✅ | ❌ | ❌ |
+| **Inovação** | 👷🏼 | ✅ | ❌ | ❌ |
 | Inovação - Projeto de ensino (tem mais tipos de inovação) | 👷🏼 |  ✅ |  ❌ | ❌ |
-| Inovação - Educação e Popularização de C&T | 👷🏼 |  ✅ |  ❌ | ❌ |
-| Inovação - Educação e Popularização de C&T - Apresentação de trabalho e palestra | ✅ |  ✅ |  ❌ | ❌ |
+| **Educação e Popularização de C&T** | 👷🏼 |  ✅ |  ❌ | ❌ |
+| Educação e Popularização de C&T - Apresentação de trabalho e palestra | ✅ |  ✅ |  ❌ | ❌ |
 | **Orientaçãoes e Supervisões** | 👷🏼 | ✅ | ✅ | ✅ |
 | Orientações e Supervisões - em andamento (not tested yet) | 👷🏼 | ✅ | ✅ | ✅ |
 | Orientações e Supervisões - em andamento - graduação (not tested yet) | 👷🏼 | ✅ | ✅ | ✅ |
@@ -105,10 +121,14 @@ As variáveis locais (em funções, loops, etc.) têm nomes em português. As va
 | Orientações e Supervisões - concluídas - doutorado (not tested) | 👷🏼 | ✅ | ✅ | ✅ |
 | **Eventos** | 👷🏼 |  ✅ |  ❌ | ❌ |
 | Eventos - Participação em eventos | 🎬 |  ✅ |  ❌ | ❌ |
+| **Bancas** | 👷🏼 |  ✅ |  ❌ | ❌ |
 | Bancas - Participação em banca de trabalhos de conclusão | 👷🏼 |  ✅ |  ❌ | ❌ |
 | Bancas - Participação em banca de trabalhos de conclusão - graduação (not tested) | 👷🏼 |  ✅ |  ❌ | ❌ |
 | Bancas - Participação em banca de trabalhos de conclusão - mestrado | 🎬 | ✅ |  ❌ | ❌ |
 | Bancas - Participação em banca de trabalhos de conclusão - doutorado (not tested) | 👷🏼 |  ✅ |  ❌ | ❌ |
+| **Citações** | ⛔️ | ✅ | ❌ | ❌ |
+| **Totais de produções** (você poderia escolher também para resumido e ampliado) | 👷🏼 | ✅ | ❌ | ❌ |
+| **Outras informações relevantes** | ⛔️ | ✅ | ❌ | ❌ |
 
 ## Exemplos ("completo")
 
