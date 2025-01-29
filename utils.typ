@@ -3317,7 +3317,7 @@
             }
 
             // publicando content
-            create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
+            create-cols([*#i*], [#participantes Participação em banca de #candidato. #emph(titulo), #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
             i -= 1
@@ -3375,7 +3375,7 @@
             }
 
             // publicando content
-            create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
+            create-cols([*#i*], [#participantes Participação em banca de #candidato. #emph(titulo), #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
             i -= 1
@@ -3432,7 +3432,7 @@
             }
 
             // publicando content
-            create-cols([*#i*], [#participantes Participação em banca de #candidato. #titulo, #ano. (#programa), #universidade ], "enum")
+            create-cols([*#i*], [#participantes Participação em banca de #candidato. #emph(titulo), #ano. (#programa), #universidade ], "enum")
 
             // diminuir o número (enumerar descendo)
             i -= 1
