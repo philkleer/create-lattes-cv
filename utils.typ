@@ -379,7 +379,7 @@
 
             // criando string de palavras-chave
             if palavras_chave.len() > 0 {
-                palavras_chave = palavras_chave.join("; ")
+                palavras_chave = palavras_chave.join("; ") + ";"
             }
 
             // criando áreas de conhecimento
@@ -1155,6 +1155,7 @@
                 // criando outras informações
                 let informacao = subset.DESCRICAO-DO-PROJETO
                 informacao = replace-quotes(informacao)
+                
                 // criando content
                 let descricao_content = [
                     #subset.NOME-DO-PROJETO
@@ -1613,7 +1614,7 @@
         let autores = format_authors(entrada.AUTORES, eu)     
         
         // criando entradas
-        // TODO:  até agora somente esses dois casos
+        // TODO: até agora somente esses dois casos
         // relatório
         if "DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA" in entrada.keys() {
             titulo = entrada.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.TITULO
@@ -1641,36 +1642,43 @@
 
         // criando string de palavras-chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
-        // areas de conhecimento
+        // criando áreas de conhecimento
         if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
-            for evento in entrada.AREAS-DO-CONHECIMENTO.keys() {
-                let subset2 = entrada.AREAS-DO-CONHECIMENTO.at(evento)
+            let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset = areas.at(key)
                 
-                for valor in subset2.keys() {
-                    let area = subset2.at(valor)
-
-                    // Define a function to capitalize the first letter of a substring
-                    let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
-
-                    if area != "" {
-                        let area_parts = area.split("_")
-
-                        area = area_parts.map(capitalize).join(" ")
-
-                        conhecimento.push(area)
+                if subset.NOME-DA-ESPECIALIDADE == "" {
+                    if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
+                        if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
+                            let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
+                            let partes = area.split("_")
+                            let novas = ()
+                            for entry in partes {
+                                entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
+                                entry = entry.replace("Ciencia", "Ciência")                                
+                                novas.push(entry)
+                            }
+                            area = novas.join(" ")
+                            conhecimento.push(area)
+                        } else {
+                            conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
+                        }
+                    } else {
+                        conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
                     }
-                }                
+                } else {
+                    conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
+                }
             }
         }
 
-        // criando string de áreas de conhecimento
-        if conhecimento.len() > 0 {
-            conhecimento = conhecimento.join("; ")
-        }
-        
         // criando content para palavras-chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
@@ -1680,7 +1688,7 @@
         // criando content para áreas de conhecimento 
         let areas_content = [] 
         if conhecimento.len() > 0 {
-            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
+            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento.join(", ")) #linebreak()]
         } 
 
         // criando link, se tem DOI, somente usar doi e não homepage
@@ -1747,39 +1755,47 @@
 
         // criando string de palavras-chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
         // criando areas de conhecimento
+        // criando áreas de conhecimento
         if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
-            for evento in entrada.AREAS-DO-CONHECIMENTO.keys() {
-                let subset2 = entrada.AREAS-DO-CONHECIMENTO.at(evento)
+            let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset = areas.at(key)
                 
-                for valor in subset2.keys() {
-                    let area = subset2.at(valor)
-
-                    // Define a function to capitalize the first letter of a substring
-                    let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
-
-                    if area != "" {
-                        let area_parts = area.split("_")
-
-                        area = area_parts.map(capitalize).join(" ")
-
-                        conhecimento.push(area)
+                if subset.NOME-DA-ESPECIALIDADE == "" {
+                    if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
+                        if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
+                            let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
+                            let partes = area.split("_")
+                            let novas = ()
+                            for entry in partes {
+                                entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
+                                entry = entry.replace("Ciencia", "Ciência")                                
+                                novas.push(entry)
+                            }
+                            area = novas.join(" ")
+                            conhecimento.push(area)
+                        } else {
+                            conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
+                        }
+                    } else {
+                        conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
                     }
-                }                
+                } else {
+                    conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
+                }
             }
-        }
-
-        // criando string de áreas de conhecimento
-        if conhecimento.len() > 0 {
-            conhecimento = conhecimento.join("; ")
         }
         
         // resumo
         if "INFORMACOES-ADICIONAIS" in entrada.keys() {
-            resumo = [#text(rgb("B2B2B2"), size: 0.85em, "Resumo: "+ entrada.INFORMACOES-ADICIONAIS.DESCRICAO-INFORMACOES-ADICIONAIS)]
+            resumo = [#text(rgb("B2B2B2"), size: 0.85em, "Resumo: "+ replace-quotes(entrada.INFORMACOES-ADICIONAIS.DESCRICAO-INFORMACOES-ADICIONAIS))]
         } else {
             resumo = ""
         }
@@ -1795,7 +1811,7 @@
         // criando content para areas 
         let areas_content = [] 
         if conhecimento.len() > 0 {
-            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
+            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento.join(", ")) #linebreak()]
         } else {
             areas_content = []
         }
@@ -1860,28 +1876,40 @@
 
         // criando string de palavras-chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
-        // criando lista de areas de conhecimento
-        if "AREAS-DO-CONHECIMENTO" in subset.keys() {
-            for entrada in subset.AREAS-DO-CONHECIMENTO.keys() {
-                let subset2 = subset.AREAS-DO-CONHECIMENTO.at(entrada)
+        // criando áreas de conhecimento
+        if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
+            let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset = areas.at(key)
                 
-                for valor in subset2.keys() {
-                    let area = subset2.at(valor)
-
-                    // Define a function to capitalize the first letter of a substring
-                    let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
-
-                    if area != "" {
-                        let area_parts = area.split("_")
-
-                        area = area_parts.map(capitalize).join(" ")
-
-                        conhecimento.push(area)
+                if subset.NOME-DA-ESPECIALIDADE == "" {
+                    if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
+                        if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
+                            let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
+                            let partes = area.split("_")
+                            let novas = ()
+                            for entry in partes {
+                                entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
+                                entry = entry.replace("Ciencia", "Ciência")                                
+                                novas.push(entry)
+                            }
+                            area = novas.join(" ")
+                            conhecimento.push(area)
+                        } else {
+                            conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
+                        }
+                    } else {
+                        conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
                     }
-                }                
+                } else {
+                    conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
+                }
             }
         }
 
@@ -1927,25 +1955,23 @@
             local_editora_content = [#local,]
         } else if local == "" and editora != "" {
             local_editora_content = [#editora,]
-        } 
+        } else {
+            local_editora_content = []
+        }
 
         // criando citação
-        let citacao = [#autores #titulo. In: #editores (ed.). #emph(titulo_livro). #local_editora_content, #ano. p. #pagina. #doi_link #linebreak()]
+        let citacao = [#autores #titulo. In: #editores (ed.). #emph(titulo_livro). #local_editora_content #ano. p. #pagina. #doi_link #linebreak()]
 
         // criando content palavras-chave
         let palavras_content = []
         if palavras_chave.len() > 0 {
             palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-        } else {
-            palavras_content = []
-        }
+        } 
 
         // criando content para áreas de conhecimento
         let areas_content = [] 
         if conhecimento.len() > 0 {
             areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
-        } else {
-            areas_content = []
         }
 
         // criando conteúdo 
@@ -2008,7 +2034,7 @@
 
         // criando string de palavras-chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
         // areas de conhecimento
@@ -2133,33 +2159,46 @@
 
         // criando string de palavras_chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
-        // areas de conhecimento
-        if "AREAS-DO-CONHECIMENTO" in subset.keys() {
-            for entrada in subset.AREAS-DO-CONHECIMENTO.keys() {
-                let subset2 = subset.AREAS-DO-CONHECIMENTO.at(entrada)
+        // criando áreas de conhecimento
+        if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
+            let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset = areas.at(key)
                 
-                for valor in subset2.keys() {
-                    let area = subset2.at(valor)
-
-                    let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
-
-                    if area != "" {
-                        let area_parts = area.split("_")
-
-                        area = area_parts.map(capitalize).join(" ")
-
-                        conhecimento.push(area)
+                if subset.NOME-DA-ESPECIALIDADE == "" {
+                    if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
+                        if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
+                            let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
+                            let partes = area.split("_")
+                            let novas = ()
+                            for entry in partes {
+                                entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
+                                entry = entry.replace("Ciencia", "Ciência")                                
+                                novas.push(entry)
+                            }
+                            area = novas.join(" ")
+                            conhecimento.push(area)
+                        } else {
+                            conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
+                        }
+                    } else {
+                        conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
                     }
-                }                
+                } else {
+                    conhecimento.push(subset.NOME-DA-Especialidade)
+                }
             }
         }
 
         // criando string de áreas de conhecimento
         if conhecimento.len() > 0 {
-            conhecimento = conhecimento.join("; ")
+            conhecimento = conhecimento.join(", ")
         }
 
         // criando conteúdo
@@ -2405,7 +2444,7 @@
                 cta_string = []
             }
 
-            let mais_informacoes = [#text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + information)#linebreak()]
+            let mais_informacoes = [#text(rgb("B2B2B2"), size: 0.85em, "Descrição: " + informacao)#linebreak()]
             
             let descricao_content = [#titulo #linebreak() #mais_informacoes #membros_string #subvencoes_string #cta_string]
 
@@ -2645,7 +2684,7 @@
 
         // criando string de palavras-chave
         if palavras_chave.len() > 0 {
-            palavras_chave = palavras_chave.join("; ")
+            palavras_chave = palavras_chave.join("; ") + ";"
         }
 
         // criando áreas de conhecimento
