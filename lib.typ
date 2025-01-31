@@ -1,5 +1,5 @@
 #import "@preview/datify:0.1.3": *
-#import "utils.typ": *
+#import "import.typ": *
 
 // Função lattes_cv: criar o PDF com os dados de lattes
 // Arguments:
@@ -92,7 +92,7 @@
     create-advanced-training(details)
 
     // Área de atuação
-    create-experience(details)
+    // create-experience(details)
     
     if kind == "completo" {
         create-projects(details)
@@ -118,7 +118,7 @@
         create-examinations(details, me)
 
         // área de eventos
-        create-events(details)
+        create-events(details, me)
     }
 
     // Área de orientações e supervisões
