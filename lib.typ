@@ -92,7 +92,7 @@
     create-advanced-training(details)
 
     // Área de atuação
-    // create-experience(details)
+    create-experience(details)
     
     if kind == "completo" {
         create-projects(details)

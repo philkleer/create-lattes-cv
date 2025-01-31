@@ -7,9 +7,22 @@
     
     // depdende de informações na entrada é dictionary (1) ou array (>1)
     if type(dados_vagas) == array {
-        
+        // criando nova entrada para ter atual mais acima
+        let helper_array = ()
+        for entrada in dados_vagas {
+            if entrada.ANO-FIM == "" {
+                entrada.insert("ORDER1", "9999")
+                entrada.insert("ORDER2", "9999")
+                helper_array.push(entrada)
+            } else {
+                entrada.insert("ORDER1", entrada.ANO-FIM)
+                entrada.insert("ORDER2", entrada.MES-FIM)
+                helper_array.push(entrada)
+            }
+        }
+
         // criando banco de dados em ordem
-        let subset = dados_vagas.sorted(key: (item) => (item.ANO-INICIO, item.MES-INICIO, item.ANO-FIM, item.MES-FIM))
+        let subset = helper_array.sorted(key: (item) => (item.ORDER1, item.ORDER2, item.ANO-INICIO, item.MES-INICIO))
 
         // criando toda entrada
         for position in subset.rev() {
@@ -287,6 +300,10 @@
             for position in entrada.VINCULOS {
                 // criando ordem para ordenar depois
                 if "ORDER1" in entrada.keys() {
+                    // corrigindo string vázio para o trabalho atual    
+                    if entrada.ORDER1 == ""{
+                        entrada.insert("ORDER1", "9999")
+                    }
                     // caso ano é mais novo na entrada do que a última entrada salva
                     if int(position.ANO-FIM) > int(entrada.ORDER1) {
                         entrada.insert("ORDER1", position.ANO-FIM)
