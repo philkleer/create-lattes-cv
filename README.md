@@ -93,7 +93,7 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | **Projetos** (talvez tenha mais tipos) | 👷🏼 |  ✅ |  ❌ |  ❌ | `DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL.ATIVIDADES-DE-PARTICIPACAO-EM-PROJETO` |
 | Projetos - Projetos de pesquisa |  🎬 |  ✅ |  ❌ | ❌ |  |
 | Projetos - Projetos de desenvolvimento tecnologica |  👷🏼 |  ✅ |  ❌ | ❌ |  |
-| Projetos - Projetos de extensão |  👷🏼 |  ✅ |  ❌ | ❌ |  |
+| Projetos - Projetos de extensão |  🎬 |  ✅ |  ❌ | ❌ |  |
 | Projetos - Projetos de ensino |  🎬 |   ✅ |  ❌ | ❌ |  |
 | Projetos - Outros tipos de extensão |  👷🏼 |  ✅ |  ❌ | ❌ | |
 | **Revisor periódico** | 🎬 |  ✅ |  ✅ |  ✅ | `DADOS-GERAIS.ATUACOES-PROFISSIONAIS.ATUACAO-PROFISSIONAL.VINCULOS.OUTRO-VINCULO-INFORMADO` |
@@ -106,6 +106,8 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Produção bibliográfica - livros | 🎬 |  ✅ |  ✅ |  ✅ | `PRODUCAO-BIBLIOGRAFICA.LIVROS-E-CAPITULOS.LIVROS-PUBLICADOS-OU-ORGANIZADOS`|
 | Produção bibliográfica - capítulos de livros | 🎬 |  ✅ |  ✅ |  ✅ | `PRODUCAO-BIBLIOGRAFICA.LIVROS-E-CAPITULOS.CAPITULOS-DE-LIVROS-PUBLICADOS`|
 | Produção bibliográfica - texto em jornal ou revista | ⛔️ | ✅ |  ❌ | ❌ | |
+| Produção bibliográfica - Trabalhos em eventos - Resumo expandido publicado em anias do congresso |  🎬 |  ✅ |  ✅ |  ✅ | 
+| Produção bibliográfica - Trabalhos em eventos - Resumo publicado em anias de congresso |  🎬 |  ✅ |  ✅ |  ✅ | 
 | **Produção técnica** | 👷🏼 | ✅ | ✅ | ✅ | |
 | Produção técnica - Demais produções técnicas | 👷🏼 |  ✅ |  ✅ | ✅ | |
 | Produção técnica - Assessoria | ⛔️ | ✅ |  ❌ | ❌ | |
@@ -134,7 +136,7 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Patentes e registros - Topografia de circuito integrado registrada| ⛔️ | 🧐 | 🧐 | 🧐 | |
 | **Bancas** | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES` |
 | Bancas - Participação em banca de trabalhos de conclusão | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO` |
-| Bancas - Participação em banca de trabalhos de conclusão - graduação (not tested) | 👷🏼 |  ✅ |  ❌ | ❌ |`DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO.PARTICIPACAO-EM-BANCA-DE-GRADUACAO` |
+| Bancas - Participação em banca de trabalhos de conclusão - graduação | 🎬 |  ✅ |  ❌ | ❌ |`DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO.PARTICIPACAO-EM-BANCA-DE-GRADUACAO` |
 | Bancas - Participação em banca de trabalhos de conclusão - mestrado | 🎬 | ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO.PARTICIPACAO-EM-BANCA-DE-MESTRADO` |
 | Bancas - Participação em banca de trabalhos de conclusão - doutorado (not tested) | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO.PARTICIPACAO-EM-BANCA-DE-DOUTORADO` |
 | Bancas - Participação em banca de trabalhos de conclusão - Exame de qualificação de doutorado | ⛔️ | ✅ |  ❌ | ❌ | |
@@ -146,8 +148,8 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Bancas - Participação em banca de comissões julgadores - Avaliação de cursos | ⛔️ | ✅ |  ❌ | ❌ | |
 | Bancas - Participação em banca de comissões julgadores - Outra | ⛔️ | ✅ |  ❌ | ❌ | |
 | **Eventos** | 👷🏼 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES` |
-| Eventos - Participação em eventos, congressos, exposições, feiras e olimpíadas | 🎬 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS` |
-| Eventos - Organização de eventos, congressos, exposições, feiras e olimpíadas | ⛔️ | ✅ |  ❌ | ❌ | |
+| Eventos - Participação em eventos, congressos, exposições, feiras e olimpíadas | 🎬 |  ✅ |  ❌ | ❌ | `DADOS-COMPLEMENTARES.PARTICIPACAO-EM-EVENTOS-CONGRESSOS` / `."PARTICIPACAO-EM-SIMPOSIO` / `.PARTICIPACAO-EM-ENCONTRO` / `.OUTRAS-PARTICIPACOES-EM-EVENTOS-CONGRESSOS` |
+| Eventos - Organização de eventos, congressos, exposições, feiras e olimpíadas | 👷🏼 | ✅ |  ❌ | ❌ | |
 | **Orientaçãoes e Supervisões** | 👷🏼 | ✅ | ✅ | ✅ | `OUTRA-PRODUCAO` |
 | Orientações e Supervisões - em andamento (not tested yet) | 👷🏼 | ✅ | ✅ | ✅ | `OUTRA-PRODUCAO.ORIENTACOES-EM-ANDAMENTO` ?|
 | Orientações e Supervisões - em andamento - graduação (not tested yet) | 👷🏼 | ✅ | ✅ | ✅ | |
@@ -158,7 +160,7 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Orientações e Supervisões - em andamento - Supervisão de pós-doutorado | ⛔️ | ✅ | ✅ | ✅ | |
 | Orientações e Supervisões - em andamento - orientação de outra natureza | ⛔️ | ✅ | ✅ | ✅ | |
 | Orientações e Supervisões - concluídas | 👷🏼 | ✅ | ✅ | ✅ | `OUTRA-PRODUCAO.ORIENTACOES-CONCLUIDAS` |
-| Orientações e Supervisões - concluídas - graduação (not all types tested) | 👷🏼 | ✅ | ✅ | ✅ | |
+| Orientações e Supervisões - concluídas - graduação (not fully tested) | 👷🏼 | ✅ | ✅ | ✅ | |
 | Orientações e Supervisões - concluídas - mestrado | 🎬 | ✅ | ✅ | ✅ | |
 | Orientações e Supervisões - concluídas - doutorado (not tested) | 👷🏼 | ✅ | ✅ | ✅ | |
 | Orientações e Supervisões - concluídas - Monografia de conclusão de curso de aperfeiçoamento/especialização | ⛔️ | ✅ | ✅ | ✅ | |
@@ -176,10 +178,10 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 | Inovação - Programa de Computador sem registro | ⛔️ | ✅ | ❌ | ❌  | |
 | Inovação - Produtos | ⛔️ | ✅ | ❌ | ❌  | |
 | Inovação - Processos ou técnicas | ⛔️ | ✅ | ❌ | ❌  | |
-| Inovação - Projeto de pesquisa | 👷🏼 |  ✅ |  ❌ | ❌ | |
-| Inovação - Projeto de desenvolvimento tecnologica | 👷🏼 | ✅ | ❌ | ❌  | |
-| Inovação - Projeto de extensão | 👷🏼 |  ✅ | ❌ | ❌  | |
-| Inovação - Projeto de ensino | 👷🏼 |  ✅ |  ❌ | ❌ | |
+| Inovação - Projeto de pesquisa | 🎬 |  ✅ |  ❌ | ❌ | |
+| Inovação - Projeto de desenvolvimento tecnologico | 👷🏼 | ✅ | ❌ | ❌  | |
+| Inovação - Projeto de extensão | 🎬 |  ✅ | ❌ | ❌  | |
+| Inovação - Projeto de ensino | 🎬 |  ✅ |  ❌ | ❌ | |
 | Inovação - Outros projetos | 👷🏼 |  ✅ | ❌ | ❌  | |
 | **Educação e Popularização de C&T** (somente um filtro) | 👷🏼 |  ✅ |  ❌ | ❌ | |
 | Educação e Popularização de C&T - Artigos aceitos para publicação |  ⛔️ | ✅ | ❌ | ❌  | |
