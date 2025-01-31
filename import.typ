@@ -1,0 +1,17 @@
+#import "functions/utils.typ": *
+// Sub files
+#import "functions/lastpage.typ": * 
+#import "functions/bibliography.typ": *
+#import "functions/innovations.typ": * 
+#import "functions/education-ct.typ": * 
+#import "functions/supervisions.typ": *
+#import "functions/events.typ": * 
+#import "functions/examinations.typ": * 
+#import "functions/projects.typ": *
+#import "functions/experience.typ": *
+#import "functions/reviewer.typ": *
+#import "functions/work-areas.typ": *
+#import "functions/education.typ": *
+#import "functions/prices.typ": *
+#import "functions/language.typ": *
+#import "functions/identification.typ": *
