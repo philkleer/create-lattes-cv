@@ -1,23 +1,21 @@
 #import "utils.typ": *
 
 // Função create-technicals(): Cria área de produções técnicos (usado em create-bibliography)
-// TODO: Até agora somente categoria "demais produções técnicos"
+// TODO: Até agora somente categoria "demais produções técnicos" (relatório de pesquisa, material didático, cursos de curta duração ministrado)
 // Argumentos:
 //  - dados_tecnicos: subset do banco de dados com só técnios
 //  - me: nome para destacar nas entradas
 //  - tipo_lattes: tipo de currículo Lattes
 #let create-technicals(dados_tecnicos, eu, tipo_lattes) = {
-    // TODO: com outras categorias mais separação entre áreas de produções técnios
-    // Não tem isso online
-    // [== Produção técnica <producao_tecnica>]
+    [== Produção técnica <producao_tecnica>]
     
     [=== Demais produções técnicas <producao_tecnica_demais>]
 
     // #all
-    let i = dados_tecnicos.len() + 1
+    let i = dados_tecnicos.len()
 
     // Then i loop into arrays
-    for entrada in dados_tecnicos {
+    for entrada in dados_tecnicos.rev() {
         // criando variáveis
         let autores = ()
         let palavras_chave = ()
@@ -35,8 +33,7 @@
         let autores = format-authors(entrada.AUTORES, eu)     
         
         // criando entradas
-        // TODO: até agora somente esses dois casos
-        // relatório
+        // relatório de pesquisa
         if "DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA" in entrada.keys() {
             titulo = entrada.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.TITULO
             ano = entrada.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.ANO
@@ -50,6 +47,13 @@
             tipo = "Desenvolvimento de material didático ou instrucional"
             doi = entrada.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.DOI
             homepage = entrada.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.HOME-PAGE-DO-TRABALHO
+        // cursos de curta duração ministrado
+        } else if "DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO" in entrada.keys() {
+            titulo = entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.TITULO
+            ano = entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.ANO
+            tipo = "Curso de curta duração ministrado"
+            doi = entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.DOI
+            homepage = entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.HOME-PAGE-DO-TRABALHO
         }
 
         // criando lista de palavras-chave
@@ -122,7 +126,7 @@
         // criando o conteúdo
         let descricao_content = []
         if tipo_lattes == "completo" {
-            descricao_content = [#autores #titulo. #ano (#tipo). #url_link#linebreak()#palavras_content #areas_content]
+            descricao_content = [#autores #titulo. #ano (#emph(tipo)). #url_link#linebreak()#palavras_content #areas_content]
         } else {
             descricao_content = [#autores #titulo. #ano (#tipo). #url_link]
         }
@@ -1488,52 +1492,89 @@
 
     // para demais técnicas
     // checando que tem ou não tem
-    let didatico = ()
-    if "DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
-        didatico = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL
-    
-        didatico = didatico.sorted(
-            key: (item) => (item.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.ANO, item.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.TITULO)
-        )
+    let todos = ()
 
-    }
-    
-    // Relatórios de pesquisa
-    // checando que tem ou não tem
-    // TODO: single case array
-    let relatorio = ()
-    if "RELATORIO-DE-PESQUISA" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
-        relatorio = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.RELATORIO-DE-PESQUISA
+    if "PRODUCAO-TECNICA" in detalhes.keys() {
+        if "DEMAIS-TIPOS-DE-PRODUCAO-TECNICA" in detalhes.PRODUCAO-TECNICA.keys() {    
+            let subset = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA
 
-        relatorio = relatorio.sorted(
-            key: (item) => (item.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.ANO, item.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.TITULO)
-        )
-    }
-    
-    // cursos curtos
-    // checando que tem ou não tem
-    // TODO: single case array
-    let cursos_curtos = ()
-    
-    if "CURSO-DE-CURTA-DURACAO-MINISTRADO" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
-        cursos_curtos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.CURSO-DE-CURTA-DURACAO-MINISTRADO
+            if "DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL" in subset.keys() {
+                if type(subset.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL) == array {
+                    let didatico = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL
 
-        if type(cursos_curtos) == array {
-            cursos_curtos = cursos_curtos.sorted(
-                key: (item) => (item.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.ANO, item.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.TITULO)
-            )
-        }
+                    for entrada in didatico {
+                        let helper = entrada
+                        helper.insert("ORDER1", entrada.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.ANO)
+                        helper.insert("ORDER2", entrada.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.TITULO)
+                        todos.push(helper)
+                    }
+                    
+                } else if type(subset.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL) == dictionary {
+                    let helper = subset.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL
+                    helper.insert("ORDER1", subset.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.ANO)
+                    helper.insert("ORDER2", subset.DESENVOLVIMENTO-DE-MATERIAL-DIDATICO-OU-INSTRUCIONAL.DADOS-BASICOS-DO-MATERIAL-DIDATICO-OU-INSTRUCIONAL.TITULO)
+                    todos.push(helper)
+
+                }
+            } 
         
-    }
+            // Relatórios de pesquisa
+            // checando que tem ou não tem
+            // TODO: single case array
+            if "RELATORIO-DE-PESQUISA" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
+                if type(subset.RELATORIO-DE-PESQUISA) == array {
+                    let relatorio = subset.RELATORIO-DE-PESQUISA
 
-    let todos = relatorio.rev() + didatico.rev()
+                    for entrada in relatorio {
+                        let helper = entrada
+                        helper.insert("ORDER1", entrada.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.ANO)
+                        helper.insert("ORDER2", entrada.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.TITULO)
+                        todos.push(helper)
+                    }
+                } else if type(subset.RELATORIO-DE-PESQUISA) == dictionary {
+                    let helper = subset.RELATORIO-DE-PESQUISA
+                    helper.insert("ORDER1", subset.RELATORIO-DE-PESQUISA.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.ANO)
+                    helper.insert("ORDER2", subset.RELATORIO-DE-PESQUISA.DADOS-BASICOS-DO-RELATORIO-DE-PESQUISA.TITULO)
+                    todos.push(helper)
+                }
+            }
+            
+            // cursos curtos
+            // checando que tem ou não tem
+            // TODO: single case array
+            
+            if "CURSO-DE-CURTA-DURACAO-MINISTRADO" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
+                if type(subset.CURSO-DE-CURTA-DURACAO-MINISTRADO) == array {
+                    let cursos_curtos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.CURSO-DE-CURTA-DURACAO-MINISTRADO
+                    
+                    for entrada in cursos_curtos {
+                        let helper = entrada
+                        helper.insert("ORDER1", entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.ANO)
+                        helper.insert("ORDER2", entrada.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.TITULO)
+                        todos.push(helper)
+                    }
+                    
+
+                } else if type(subset.CURSO-DE-CURTA-DURACAO-MINISTRADO) == dictionary {
+                    let helper = subset.CURSO-DE-CURTA-DURACAO-MINISTRADO
+                    helper.insert("ORDER1", subset.CURSO-DE-CURTA-DURACAO-MINISTRADO.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.ANO)
+                    helper.insert("ORDER2", subset.CURSO-DE-CURTA-DURACAO-MINISTRADO.DADOS-BASICOS-DE-CURSOS-CURTA-DURACAO-MINISTRADO.TITULO)
+                    todos.push(helper)
+                }
+            }
+                
+        }
+
+        todos = todos.sorted(key: (item) => (item.ORDER1, item.ORDER2))
+    }
 
     // criando cabeçalho
-    if artigos.len() > 0 or livros.len() > 0 or capitulos.len() > 0 or todos.len() > 0 {
+    if artigos.len() > 0 or livros.len() > 0 or capitulos.len() > 0 or apresentacoes.len() > 0 or completos.len() > 0 or resumos.len() > 0 or expandidos.len() > 0 or todos.len() > 0 {
         [= Produção <producao>]
+    }
 
+    if artigos.len() > 0 or livros.len() > 0 or capitulos.len() > 0 or apresentacoes.len() > 0 or completos.len() > 0 or resumos.len() > 0 or expandidos.len() > 0 {
         [== Produção bibliográfica <producao_bibliografica>]
-
     }
 
     // criando área de artigos
@@ -1563,7 +1604,6 @@
         }
     }
     
-
     // criando área de técnicos
     if todos.len() > 0 {
         create-technicals(todos, eu, tipo_lattes)

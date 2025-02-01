@@ -2,6 +2,8 @@
 
 # 👷🏼‍♀️ ⚠ Ainda em construção, não está pronto para todos os tipos de entradas.
 
+_English version below_
+
 [LATTES](https://lattes.cnpq.br) é uma ótima plataforma para acadêmicos armazenarem todo o seu trabalho científico. No entanto, as opções de exportação são bastante frustrantes, já que a exportação em RTF não resulta em um currículo com uma boa aparência.
 
 Por isso, estou tentando resolver esse problema exportando o arquivo XML e criando este modelo para gerar um PDF bem formatado usando [Typst](https://typst.app). Se você ainda não conhece o [Typst](https://typst.app), ele é uma linguagem muito mais fácil de aprender e um compositor mais rápido do que o LaTeX.
@@ -219,3 +221,89 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 ![LATTES CV 4](assets/pagina-4.png)
 
 ![LATTES CV 5](assets/pagina-5.png)
+
+
+# English version
+
+# 👷🏼‍♀️ ⚠ Still under construction, it is not ready for all types of entrances.
+
+[LATTES](https://lattes.cnpq.br) is a great platform for academics to store all their scientific work. However, the export options are quite frustrating, as exporting to RTF does not result in a well-formatted résumé.  
+
+That's why I'm trying to solve this problem by exporting the XML file and creating this template to generate a well-formatted PDF using [Typst](https://typst.app). If you haven't heard of [Typst](https://typst.app) yet, it's a much easier-to-learn language and a faster typesetting system than LaTeX.  
+
+I started this project, and since my [LATTES](https://lattes.cnpq.br) résumé does not include all possible options, there may be errors when you test it. You can open an [issue]() or create a pull request with a suggested fix. Additionally, this is just the beginning, so the code may not be as clean and elegant as it should be.
+
+## Fonts
+
+I use [Source Sans Pro](https://fonts.google.com/specimen/Source+Sans+3), which you can get [here](https://fonts.google.com/specimen/Source+Sans+3).
+
+## Usage
+
+### Export XML file and create a TOML file
+
+Since I am more familiar with TOML files and their use in [Typst](https://typst.app), I created the Python script `helper.py`, which converts your [LATTES](https://lattes.cnpq.br) XML file into a TOML file. To perform the transformation, simply run the following command in the terminal where the script is located:
+
+```bash
+python3 helper.py path-to-your-xml-file
+```
+
+This will create the file my-file.toml, which you can use in Typst documents.
+
+### Creating the PDF  
+
+The structure of the main file is quite simple. You only need to specify which version of the résumé you want in the `kind` argument: `resumido`, `ampliado`, or `completo`. Depending on your choice, you use the specific function:  
+
+```typst
+// Import of libraries
+#import "lib.typ": *
+#import "@preview/datify:0.1.3": *
+
+#show: lattes-cv.with(
+  database: "data/lattes.toml",
+  kind: "completo",
+  me: "KLEER",
+  date: datetime.today()
+  last_page: true
+)     
+```
+
+#### Using Typst locally  
+
+Before using it, you need to install or update to Typst 0.12. Instructions on how to install it are described [here](https://github.com/typst/typst).  
+
+#### Using Typst's online editor  
+
+You can use the online [Typst](https://typst.app) editor to create a project. You can copy this project, which already contains all the necessary files (except the Lattes-generated file): [Link](https://typst.app/project/rDHeKkEoT9UuHDnnH93mQq). You can duplicate the project for your use.  
+
+Before running it, you only need to upload the transformed `.toml` file from Lattes.  
+
+### Using or improving functions  
+
+This is a first simple approach to a solution, and I haven’t fully structured everything yet. The main goal so far is to have functions for each section, which are called only if the specific section is present in the XML/TOML data.  
+
+Local variables (inside functions, loops, etc.) have names in Portuguese. Global variables have names in English (global refers to their use in `lib.typ`).  
+
+### How to contribute? (Pull request)  
+
+If you want to contribute to the project, you can create a *fork* and then submit a *pull request* to add your code.  
+
+### What is already included  
+
+Below is a table listing the sections in the Lattes résumé. I don’t have all categories in mine, so I’m unsure which categories are included. If your résumé contains one of the categories marked with 🧐, you can update the table accordingly.  
+
+#### Status of area implementation  
+
+👷🏼 : needs work (partially coded)  
+
+🎬 : completed  
+
+⛔️ : not started yet  
+
+#### Inclusion in résumé type  
+
+❌ : not included in this type  
+
+✅ : included in this type  
+
+🧐 : uncertain whether it is included or not  
+You can access the list above!

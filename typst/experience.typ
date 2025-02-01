@@ -171,7 +171,7 @@
 
                 disciplinas_text = ministradas.join("; ")
 
-                disciplinas_text = "Disciplinas ministradas: " + disciplinas_text
+                disciplinas_text = "Disciplinas ministradas: " + disciplinas_text + ";"
             }
                 
             let descricao_content = [#nivel, #dados_ensino.NOME-CURSO #linebreak()#text(rgb("B2B2B2"), size: 0.85em, disciplinas_text)]
@@ -214,7 +214,7 @@
 
                 disciplinas_text = ministradas.join("; ")
 
-                disciplinas_text = "Disciplinas ministradas: " + disciplinas_text
+                disciplinas_text = "Disciplinas ministradas: " + disciplinas_text + ";"
             }
                 
             let descricao_content = [#nivel, #curso.NOME-CURSO #linebreak()#text(rgb("B2B2B2"), size: 0.85em, disciplinas_text)]

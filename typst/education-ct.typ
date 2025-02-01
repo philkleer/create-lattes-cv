@@ -1,15 +1,17 @@
 #import "utils.typ": *
 
-// Função create-ct-presentations(): Cria subárea de apresentações dentro da área Educação e Popularização C&T
+// Função create-ct-area(): Cria subárea de área Educação e Popularização C&T
 // Argumento:
-//  - dados_apresentacoes: o banco de dados com apresentações
-#let create-ct-presentations(dados_apresentacoes, eu) = {
-    [=== Apresentação de trabalho e palestra <ct_apresentacoes>]
+//  - dados: o banco de dados com apresentações
+//  - eu:  nome para destacaar
+//  - cabecalho: cabeçalho para área
+#let create-ct-area(dados, eu, cabecalho) = {
+    [=== #cabecalho <ct_apresentacoes>]
             
     // criando números para oddem
-    let i = dados_apresentacoes.len()
+    let i = dados.len()
 
-    for entrada in dados_apresentacoes.rev() {
+    for entrada in dados.rev() {
 
         // criando sub-banco de dados para cada entrada
         let subset = entrada.DADOS-BASICOS-DA-APRESENTACAO-DE-TRABALHO
@@ -131,7 +133,7 @@
 
     // entradas de apresentações
     if congressos.len() > 0 {
-        create-ct-presentations(congressos, eu)
+        create-ct-area(congressos, eu, "Apresentação de trabalho e palestra")
     }
 
     // TODO: HERE ADJUST LINEBREAK!

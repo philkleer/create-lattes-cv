@@ -272,8 +272,7 @@
 
             // criando soma de cursos curtos
             if num_cursos_curtos > 0 {
-                // create-cols([#link(<ensino_atuacao>)[Curso de curta duração ministrado #box(width: 1fr, repeat[.])]], [#num_cursos_curtos], "lastpage")
-                create-cols([Curso de curta duração ministrado #box(width: 1fr, repeat[.])], [#num_cursos_curtos], "lastpage")
+                create-cols([#link(<producao_tecnica_demais>)[Curso de curta duração ministrado #box(width: 1fr, repeat[.])]], [#num_cursos_curtos], "lastpage")
             }
             
             // criando soma de materiais didáticos

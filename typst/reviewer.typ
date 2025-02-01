@@ -1,5 +1,110 @@
 #import "utils.typ": *
 
+// Função create-reviewer-journal(): Cria áreas de revisor de periódico
+// Argumento:
+//  - dados: o sub-banco de dados de periódicos
+//  - 
+#let create-reviewer-area(dados, cabecalho) = {
+    // Caso revisor de periódicos
+    if dados.len() > 0 {
+        // criando cabeçalho
+        [= #cabecalho]
+
+        // criando variáveis
+        let tempo_content = []
+
+        // loop para cada entrada
+        for entrada in dados.rev() {
+            // Caso: somente uma entrada
+            if type(entrada) == dictionary {
+                // loop para mais informações do vínculo
+                for vinculo in entrada {
+                    
+                    // criando tempo
+                    if entrada.VINCULOS.ANO-FIM == "" {
+                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
+                    } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
+                        tempo_content = [#entrada.VINCULOS.ANO-FIM]
+                    } else {
+                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - #entrada.VINCULOS.ANO-FIM]
+                    }
+                }
+            
+
+                // extrair mais informações se tiver
+                let informacao = []
+                if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
+                    let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
+                    texto = replace-quotes(texto)
+
+                    informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
+                }
+
+                // criando conteúdo
+                let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
+                
+                // publicando content
+                create-cols([*#tempo_content*], descricao_content, "small")
+            }
+        }
+
+        // create distância e linha
+        linebreak()
+
+        line(length: 100%)
+    } 
+}
+
+// Função create-reviewer-advice(): Cria áreas de revisor de assessoria
+// Argumento:
+//  - dados: o sub-banco de dados de periódicos
+//  - 
+#let create-reviewer-advice(dados) = {
+    // caso membro de comitê de assessora
+    if assessora.len() > 0 {
+        // criando cabeçalho
+        [= Membro de comitê de assessora <assessora>]
+
+        // criando variáveis
+        let tempo_content = []
+
+        // loop para cada entrada
+        for entrada in assessora.rev() {
+            // Caso: somente uma entrada
+            if type(entrada) == dictionary {
+                // loop para mais informações do vínculo
+                for vinculo in entrada {
+                    
+                    // criando tempo
+                    if entrada.VINCULOS.ANO-FIM == "" {
+                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
+                    } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
+                        tempo_content = [#entrada.VINCULOS.ANO-FIM]
+                    } else {
+                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - #entrada.VINCULOS.ANO-FIM]
+                    }
+                }
+                
+
+                // extrair mais informações se tiver
+                let informacao = []
+                if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
+                    let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
+                    texto = replace-quotes(texto)
+
+                    informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
+                }
+
+                // criando content
+                let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
+                
+                // publicando content
+                create-cols([*#tempo_content*], descricao_content, "small")
+            }
+        }
+    } 
+}
+
 // Função create-reviewer(): Cria áreas de revisor (periódico, assessora, fomento)
 // Argumento:
 //  - detalhes: o banco de dados de Lattes (TOML File)
@@ -116,151 +221,10 @@
 
     fomento = fomento.sorted(key: (item) => (item.VINCULOS.ANO-FIM, item.VINCULOS.ANO-INICIO, item.VINCULOS.MES-FIM, item.VINCULOS.MES-INICIO))
 
-    // Caso revisor de periódicos
-    if periodico.len() > 0 {
-        // criando cabeçalho
-        [= Revisor de periódico <periodicos>]
+    create-reviewer-area(periodico, "Revisor de periódico")
 
-        // criando variáveis
-        let tempo_content = []
+    create-reviewer-area(assessora, "Membro de comitê de assessoramento")
 
-        // loop para cada entrada
-        for entrada in periodico.rev() {
-            // Caso: somente uma entrada
-            if type(entrada) == dictionary {
-                // loop para mais informações do vínculo
-                for vinculo in entrada {
-                    
-                    // criando tempo
-                    if entrada.VINCULOS.ANO-FIM == "" {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
-                    } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
-                        tempo_content = [#entrada.VINCULOS.ANO-FIM]
-                    } else {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - #entrada.VINCULOS.ANO-FIM]
-                    }
-                }
-            
+    create-reviewer-area(fomento, "Revisor de projeto de agência de fomento")
 
-                // extrair mais informações se tiver
-                let informacao = []
-                if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
-                    let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
-                    texto = replace-quotes(texto)
-
-                    informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
-                }
-
-                // criando conteúdo
-                let descricao_content = [#entrada.NOME-INSTITUICAO #linebreak() #informacao]
-                
-                // publicando content
-                create-cols([*#tempo_content*], descricao_content, "small")
-            }
-        }
-
-        // create distância e linha
-        linebreak()
-
-        line(length: 100%)
-    } 
-
-    // caso membro de comitê de assessora
-    if assessora.len() > 0 {
-        // criando cabeçalho
-        [= Membro de comitê de assessora <assessora>]
-
-        // criando variáveis
-        let tempo_content = []
-
-        // loop para cada entrada
-        for entrada in assessora.rev() {
-            // Caso: somente uma entrada
-            if type(entrada) == dictionary {
-                // loop para mais informações do vínculo
-                for vinculo in entrada {
-                    
-                    // criando tempo
-                    if entrada.VINCULOS.ANO-FIM == "" {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
-                    } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
-                        tempo_content = [#entrada.VINCULOS.ANO-FIM]
-                    } else {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - #entrada.VINCULOS.ANO-FIM]
-                    }
-                }
-                
-
-                // extrair mais informações se tiver
-                let informacao = []
-                if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
-                    let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
-                    texto = replace-quotes(texto)
-
-                    informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
-                }
-
-                // criando content
-                let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
-                
-                // publicando content
-                create-cols([*#tempo_content*], descricao_content, "small")
-            }
-        }
-
-        // create distância e linha
-        linebreak()
-
-        line(length: 100%)
-    } 
-
-    // caso revisor de projeto de agência de fomento
-    if fomento.len() > 0 {
-        // criando cabeçalho
-        [= Revisor de projeto de agência de fomento <fomento>]
-
-        // criando variáveis
-        let tempo_content = []
-
-        // loop para cada entrada
-        for entrada in fomento.rev() {
-            // Caso: somente uma entrada
-            if type(entrada) == dictionary {
-
-                // loop para mais informações do vínculo
-                for vinculo in entrada {
-                    
-                    // criando tempo
-                    if entrada.VINCULOS.ANO-FIM == "" {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - atual]
-                    } else if entrada.VINCULOS.ANO-FIM == entrada.VINCULOS.ANO-INICIO {
-                        tempo_content = [#entrada.VINCULOS.ANO-FIM]
-                    } else {
-                        tempo_content = [#entrada.VINCULOS.ANO-INICIO - #entrada.VINCULOS.ANO-FIM]
-                    }
-                }
-                
-
-                // extrair mais informações se tiver
-                let informacao = []
-                if entrada.VINCULOS.OUTRAS-INFORMACOES != "" {
-                    let texto = entrada.VINCULOS.OUTRAS-INFORMACOES
-                    texto = replace-quotes(texto)
-
-                    informacao = [#linebreak() #text(rgb("B2B2B2"), size: 0.85em, "Outras informações: " + texto)]
-                }
-
-                // criando content
-                let descricao_content = [#entrada.NOME-INSTITUICAO #informacao]
-                
-                // publicando content
-                create-cols([*#tempo_content*], descricao_content, "small")
-            }
-        }
-
-        // create distância e linha
-        linebreak()
-
-        line(length: 100%)
-    } 
 }

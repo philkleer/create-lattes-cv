@@ -1,5 +1,5 @@
 #import "@preview/datify:0.1.3": *
-#import "import.typ": *
+#import "typst/import.typ": *
 
 // Função lattes_cv: criar o PDF com os dados de lattes
 // Arguments:
@@ -95,7 +95,7 @@
     create-experience(details)
     
     if kind == "completo" {
-        create-projects(details)
+        create-projects(details, me)
     }    
 
     // Área de revisor
@@ -126,7 +126,7 @@
 
     // Área de inovação
     if kind == "completo" {
-        create-innovations(details)
+        create-innovations(details, me)
 
         create-education-ct(details, me)
     }
