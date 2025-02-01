@@ -286,7 +286,6 @@
         entry => entry.SEQUENCIA-IMPORTANCIA != ""
     )
 
-    // TODO: necessário de ordenar
     // tem dois tipos (array e dictionary)
     // processo para ordenar correto
     let helper_array = ()
