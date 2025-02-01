@@ -4,8 +4,8 @@
 *.pdf
 
 # remove my personal files from sync
-data/lattes.toml
-data/lattes.xml
+data/*
+!data/example.toml
 
 # para testes
 test.typ
