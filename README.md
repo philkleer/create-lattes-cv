@@ -222,6 +222,8 @@ Embaixo tem uma tabela sobre as áreas no currículo Lattes. Eu não tenho todas
 
 ![LATTES CV 5](assets/pagina-5.png)
 
+![LATTES CV 6](assets/pagina-6.png)
+
 
 # English version
 
