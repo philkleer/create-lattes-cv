@@ -5,7 +5,7 @@
 
 # remove my personal files from sync
 data/*
-!data/example.toml
+!data/exemplo.toml
 
 # para testes
 test.typ
