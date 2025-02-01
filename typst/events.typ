@@ -66,7 +66,11 @@
             let ano = subset.ANO
             let natureza = subset.NATUREZA
             let titulo = subset.TITULO
-
+            
+            // se tipo é vázio, tenta forma-participacao
+            if tipo == "" {
+                tipo = subset.FORMA-PARTICIPACAO
+            }
             // criando texto
             let tipo_content = []
             if tipo != "" {
