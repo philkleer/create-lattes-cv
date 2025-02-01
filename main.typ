@@ -9,7 +9,7 @@
 // - me: o nome para destacar nas citações (string)
 // - last_page: resumo de produção no final (boolean)
 #show: lattes-cv.with(
-  database: "data/lattes.toml",
+  database: "data/exemplo.toml",
   kind: "completo",
   me: "KLEER",
   last_page: true
