@@ -165,6 +165,8 @@
             tipo = "Apresentação de Trabalho / Conferência ou Palestra"
         } else if tipo == "SEMINARIO" {
             tipo = "Apresentação de Trabalho / Seminário"
+        } else if tipo == "SIMPOSIO" {
+            tipo = "Apresentação de Trabalho / Simpósio"
         } else {
         tipo = "Apresentação de Trabalho / " + tipo.slice(0, 1) + lower(tipo.slice(1))
         }
@@ -371,7 +373,7 @@
             // Criandon editores content
             let editores_content = []
             if editores.len() > 0 {
-                editores_content = [#editores.join(";")]
+                editores_content = [#editores.join("; ")]
             }
 
             // criando o link, prefire DOI 
@@ -849,7 +851,7 @@
         let doi = subset.DADOS-BASICOS-DO-ARTIGO.DOI
         let periodico = subset.DETALHAMENTO-DO-ARTIGO.TITULO-DO-PERIODICO-OU-REVISTA
         let volume = subset.DETALHAMENTO-DO-ARTIGO.VOLUME
-        
+    
         let pagina = []
         if subset.DETALHAMENTO-DO-ARTIGO.PAGINA-FINAL == "" {
             pagina = subset.DETALHAMENTO-DO-ARTIGO.PAGINA-INICIAL
@@ -948,420 +950,180 @@
     }   
 }
 
+// Função create-abstracts-area(): Cria sub-área de resumos (completos, resumos, expandidos)
+// Argumentos:
+// - dados: sub-banco de dados com as entradas de tipo
+// - eu: nome para destacar
+// - tipo_lattes: cabeçalho da área
+#let create-abstracts-area(dados, eu, tipo_lattes) = {
+    
+    let i = dados.len()
+
+    for entrada in dados.rev() {
+
+        // initialize variables
+        let palavras_chave = ()
+        let conhecimento = ()
+        let subset = entrada
+
+        // autores
+        let autores = format-authors(subset.AUTORES, eu)        
+
+        // título
+        let titulo = subset.DADOS-BASICOS-DO-TRABALHO.TITULO-DO-TRABALHO
+
+        // título de anais ou proceedings
+        let titulo_anais = subset.DETALHAMENTO-DO-TRABALHO.TITULO-DOS-ANAIS-OU-PROCEEDINGS
+        let local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DO-EVENTO
+        let editora = subset.DETALHAMENTO-DO-TRABALHO.NOME-DA-EDITORA
+        let editora_local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DA-EDITORA
+        let evento_nome = subset.DETALHAMENTO-DO-TRABALHO.NOME-DO-EVENTO
+        // ano
+        let ano = subset.DADOS-BASICOS-DO-TRABALHO.ANO-DO-TRABALHO
+        
+        // doi
+        let doi = subset.DADOS-BASICOS-DO-TRABALHO.DOI
+
+        // criando lista de palavras-chave
+        if "PALAVRAS-CHAVE" in subset.keys() {
+            for palavra in subset.PALAVRAS-CHAVE.keys() {
+                if subset.PALAVRAS-CHAVE.at(palavra) != "" {
+                    palavras_chave.push(subset.PALAVRAS-CHAVE.at(palavra))    
+                }
+            }
+        }
+
+        // criando string de palavras-chave
+        if palavras_chave.len() > 0 {
+            palavras_chave = palavras_chave.join("; ") + ";"
+        }
+
+        // criando áreas de conhecimento
+        if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
+            let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+
+            let i = 0
+            
+            for key in areas.keys() {
+                let subset = areas.at(key)
+                
+                if subset.NOME-DA-ESPECIALIDADE == "" {
+                    if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
+                        if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
+                            let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
+                            let partes = area.split("_")
+                            let novas = ()
+                            for entry in partes {
+                                entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
+                                entry = entry.replace("Ciencia", "Ciência")                                
+                                novas.push(entry)
+                            }
+                            area = novas.join(" ")
+                            conhecimento.push(area)
+                        } else {
+                            conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
+                        }
+                    } else {
+                        conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
+                    }
+                } else {
+                    conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
+                }
+            }
+        }
+
+        // criando string de áreas de conhecimento
+        if conhecimento.len() > 0 {
+            conhecimento = conhecimento.join(", ")
+        }
+
+        // criando o link, prefire DOI 
+        let doi_link = []
+        if doi.len() > 0 {
+            doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
+        }
+        
+        // criando local & editora
+        let local_editora_content = []
+        if local != "" and editora != "" {
+            local_editora_content = [, #local: #editora] 
+        } else if local != "" and editora == "" {
+            local_editora_content = [, #local]
+        } else if local == "" and editora != "" {
+            if editora_local == "" {
+                local_editora_content = [, #editora]
+            } else {
+                local_editora_content = [, #editora_local: #editora]
+            }                
+        } else {
+            local_editora_content = []
+        }
+
+        // criando content titulo anais
+        let titulo_anais_content = []
+        if titulo_anais != "" {
+            titulo_anais_content = [, #emph(titulo_anais)]
+        }
+
+        // criando citação
+        let citacao = [#autores #text(titulo, weight: "semibold"). In: #evento_nome, #ano#local_editora_content#titulo_anais_content. #doi_link #linebreak()]
+
+        // criando content palavras-chave
+        let palavras_content = []
+        if palavras_chave.len() > 0 {
+            palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
+        } 
+
+        // criando content para áreas de conhecimento
+        let areas_content = [] 
+        if conhecimento.len() > 0 {
+            areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
+        }
+
+        // criando conteúdo 
+        let descricao_content = []
+        if tipo_lattes == "completo" {
+            descricao_content = [#citacao #palavras_content #areas_content]
+        } else {
+            descricao_content = [#citacao]
+        }
+        // publicando content
+        create-cols([*#i*], [#descricao_content], "enum")
+
+        // diminuir número para ordem
+        i -= 1
+    }   
+}
+
 // Função create-abstracts(): Cria área de produções técnicos (usado em create-bibliography)
+// Argumentos:
+//  - dados_completos: subset do banco de dados com completos
 //  - dados_resumos: subset do banco de dados com resumos simples
 //  - dados_expandidos: subset do banco de dados com resumos expandidos
-//  - me: nome para destacar nas entradas
+//  - eu: nome para destacar nas entradas
 #let create-abstracts(dados_completos, dados_resumos, dados_expandidos, eu, tipo_lattes) = {
 
     if dados_completos.len() > 0 {
         [=== Trabalhos publicados em anais de eventos (completos)<producao-anais>]
 
-        // criando número para ordem
-        let i = dados_completos.len()
+        create-abstracts-area(dados_completos, eu, tipo_lattes)
 
-        for entrada in dados_completos.rev() {
-
-            // initialize variables
-            let palavras_chave = ()
-            let conhecimento = ()
-            let subset = entrada
-
-            // autores
-            let autores = format-authors(subset.AUTORES, eu)        
-
-            // título
-            let titulo = subset.DADOS-BASICOS-DO-TRABALHO.TITULO-DO-TRABALHO
-
-            // título de anais ou proceedings
-            let titulo_anais = subset.DETALHAMENTO-DO-TRABALHO.TITULO-DOS-ANAIS-OU-PROCEEDINGS
-            let local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DO-EVENTO
-            let editora = subset.DETALHAMENTO-DO-TRABALHO.NOME-DA-EDITORA
-            let editora_local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DA-EDITORA
-            let evento_nome = subset.DETALHAMENTO-DO-TRABALHO.NOME-DO-EVENTO
-            // ano
-            let ano = subset.DADOS-BASICOS-DO-TRABALHO.ANO-DO-TRABALHO
-            
-            // doi
-            let doi = subset.DADOS-BASICOS-DO-TRABALHO.DOI
-
-            // criando lista de palavras-chave
-            if "PALAVRAS-CHAVE" in subset.keys() {
-                for palavra in subset.PALAVRAS-CHAVE.keys() {
-                    if subset.PALAVRAS-CHAVE.at(palavra) != "" {
-                        palavras_chave.push(subset.PALAVRAS-CHAVE.at(palavra))    
-                    }
-                }
-            }
-
-            // criando string de palavras-chave
-            if palavras_chave.len() > 0 {
-                palavras_chave = palavras_chave.join("; ") + ";"
-            }
-
-            // criando áreas de conhecimento
-            if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
-                let areas = entrada.at("AREAS-DO-CONHECIMENTO")
-
-                let i = 0
-                
-                for key in areas.keys() {
-                    let subset = areas.at(key)
-                    
-                    if subset.NOME-DA-ESPECIALIDADE == "" {
-                        if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
-                            if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
-                                let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
-                                let partes = area.split("_")
-                                let novas = ()
-                                for entry in partes {
-                                    entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
-                                    entry = entry.replace("Ciencia", "Ciência")                                
-                                    novas.push(entry)
-                                }
-                                area = novas.join(" ")
-                                conhecimento.push(area)
-                            } else {
-                                conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
-                            }
-                        } else {
-                            conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
-                        }
-                    } else {
-                        conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
-                    }
-                }
-            }
-
-            // criando string de áreas de conhecimento
-            if conhecimento.len() > 0 {
-                conhecimento = conhecimento.join(", ")
-            }
-
-            // criando o link, prefire DOI 
-            let doi_link = []
-            if doi.len() > 0 {
-                doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
-            }
-            
-            // criando local & editora
-            let local_editora_content = []
-            if local != "" and editora != "" {
-                local_editora_content = [#local: #editora,] 
-            } else if local != "" and editora == "" {
-                local_editora_content = [#local,]
-            } else if local == "" and editora != "" {
-                if editora_local == "" {
-                    local_editora_content = [#editora,]
-                } else {
-                    local_editora_content = [#editora_local: #editora,]
-                }                
-            } else {
-                local_editora_content = []
-            }
-
-            // criando citação
-            let citacao = [#autores #text(titulo, weight: "semibold"). In: #evento_nome, #ano, #local_editora_content #emph(titulo_anais). #doi_link #linebreak()]
-
-            // criando content palavras-chave
-            let palavras_content = []
-            if palavras_chave.len() > 0 {
-                palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-            } 
-
-            // criando content para áreas de conhecimento
-            let areas_content = [] 
-            if conhecimento.len() > 0 {
-                areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
-            }
-
-            // criando conteúdo 
-            let descricao_content = []
-            if tipo_lattes == "completo" {
-                descricao_content = [#citacao #palavras_content #areas_content]
-            } else {
-                descricao_content = [#citacao]
-            }
-            // publicando content
-            create-cols([*#i*], [#descricao_content], "enum")
-
-            // diminuir número para ordem
-            i -= 1
-        }   
     }
 
     if dados_resumos.len() > 0 {
         [=== Trabalhos publicados em anais de eventos (resumo)]
 
-        // criando número para ordem
-        let i = dados_resumos.len()
-
-        for entrada in dados_resumos.rev() {
-
-            // initialize variables
-            let palavras_chave = ()
-            let conhecimento = ()
-            let subset = entrada
-
-            // autores
-            let autores = format-authors(subset.AUTORES, eu)        
-
-            // título
-            let titulo = subset.DADOS-BASICOS-DO-TRABALHO.TITULO-DO-TRABALHO
-
-            // título de anais ou proceedings
-            let titulo_anais = subset.DETALHAMENTO-DO-TRABALHO.TITULO-DOS-ANAIS-OU-PROCEEDINGS
-            let local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DO-EVENTO
-            let editora = subset.DETALHAMENTO-DO-TRABALHO.NOME-DA-EDITORA
-            let editora_local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DA-EDITORA
-            let evento_nome = subset.DETALHAMENTO-DO-TRABALHO.NOME-DO-EVENTO
-            // ano
-            let ano = subset.DADOS-BASICOS-DO-TRABALHO.ANO-DO-TRABALHO
-            
-            // doi
-            let doi = subset.DADOS-BASICOS-DO-TRABALHO.DOI
-
-            // criando lista de palavras-chave
-            if "PALAVRAS-CHAVE" in subset.keys() {
-                for palavra in subset.PALAVRAS-CHAVE.keys() {
-                    if subset.PALAVRAS-CHAVE.at(palavra) != "" {
-                        palavras_chave.push(subset.PALAVRAS-CHAVE.at(palavra))    
-                    }
-                }
-            }
-
-            // criando string de palavras-chave
-            if palavras_chave.len() > 0 {
-                palavras_chave = palavras_chave.join("; ") + ";"
-            }
-
-            // criando áreas de conhecimento
-            if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
-                let areas = entrada.at("AREAS-DO-CONHECIMENTO")
-
-                let i = 0
-                
-                for key in areas.keys() {
-                    let subset = areas.at(key)
-                    
-                    if subset.NOME-DA-ESPECIALIDADE == "" {
-                        if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
-                            if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
-                                let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
-                                let partes = area.split("_")
-                                let novas = ()
-                                for entry in partes {
-                                    entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
-                                    entry = entry.replace("Ciencia", "Ciência")                                
-                                    novas.push(entry)
-                                }
-                                area = novas.join(" ")
-                                conhecimento.push(area)
-                            } else {
-                                conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
-                            }
-                        } else {
-                            conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
-                        }
-                    } else {
-                        conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
-                    }
-                }
-            }
-
-            // criando string de áreas de conhecimento
-            if conhecimento.len() > 0 {
-                conhecimento = conhecimento.join(", ")
-            }
-
-            // criando o link, prefire DOI 
-            let doi_link = []
-            if doi.len() > 0 {
-                doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
-            }
-            
-            // criando local & editora
-            let local_editora_content = []
-            if local != "" and editora != "" {
-                local_editora_content = [#local: #editora,] 
-            } else if local != "" and editora == "" {
-                local_editora_content = [#local,]
-            } else if local == "" and editora != "" {
-                if editora_local == "" {
-                    local_editora_content = [#editora,]
-                } else {
-                    local_editora_content = [#editora_local: #editora,]
-                }                
-            } else {
-                local_editora_content = []
-            }
-
-            // criando citação
-            let citacao = [#autores #text(titulo, weight: "semibold"). In: #evento_nome, #ano, #local_editora_content #emph(titulo_anais). #doi_link #linebreak()]
-
-            // criando content palavras-chave
-            let palavras_content = []
-            if palavras_chave.len() > 0 {
-                palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-            } 
-
-            // criando content para áreas de conhecimento
-            let areas_content = [] 
-            if conhecimento.len() > 0 {
-                areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
-            }
-
-            // criando conteúdo 
-            let descricao_content = []
-            if tipo_lattes == "completo" {
-                descricao_content = [#citacao #palavras_content #areas_content]
-            } else {
-                descricao_content = [#citacao]
-            }
-            // publicando content
-            create-cols([*#i*], [#descricao_content], "enum")
-
-            // diminuir número para ordem
-            i -= 1
-        }   
+        create-abstracts-area(dados_resumos, eu, tipo_lattes) 
     }
 
     if dados_expandidos.len() > 0 {
         [=== Trabalhos publicados em anais de eventos (resumo expandido)]
 
-        // criando número para ordem
-        let i = dados_expandidos.len()
-
-        for entrada in dados_expandidos.rev() {
-
-            // initialize variables
-            let palavras_chave = ()
-            let conhecimento = ()
-            let subset = entrada
-
-            // autores
-            let autores = format-authors(subset.AUTORES, eu)        
-
-            // título
-            let titulo = subset.DADOS-BASICOS-DO-TRABALHO.TITULO-DO-TRABALHO
-
-            // título de anais ou proceedings
-            let titulo_anais = subset.DETALHAMENTO-DO-TRABALHO.TITULO-DOS-ANAIS-OU-PROCEEDINGS
-            let local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DO-EVENTO
-            let editora = subset.DETALHAMENTO-DO-TRABALHO.NOME-DA-EDITORA
-            let editora_local = subset.DETALHAMENTO-DO-TRABALHO.CIDADE-DA-EDITORA
-            let evento_nome = subset.DETALHAMENTO-DO-TRABALHO.NOME-DO-EVENTO
-            // ano
-            let ano = subset.DADOS-BASICOS-DO-TRABALHO.ANO-DO-TRABALHO
-            
-            // doi
-            let doi = subset.DADOS-BASICOS-DO-TRABALHO.DOI
-
-            // criando lista de palavras-chave
-            if "PALAVRAS-CHAVE" in subset.keys() {
-                for palavra in subset.PALAVRAS-CHAVE.keys() {
-                    if subset.PALAVRAS-CHAVE.at(palavra) != "" {
-                        palavras_chave.push(subset.PALAVRAS-CHAVE.at(palavra))    
-                    }
-                }
-            }
-
-            // criando string de palavras-chave
-            if palavras_chave.len() > 0 {
-                palavras_chave = palavras_chave.join("; ") + ";"
-            }
-
-            // criando áreas de conhecimento
-            if "AREAS-DO-CONHECIMENTO" in entrada.keys() {
-                let areas = entrada.at("AREAS-DO-CONHECIMENTO")
-
-                let i = 0
-                
-                for key in areas.keys() {
-                    let subset = areas.at(key)
-                    
-                    if subset.NOME-DA-ESPECIALIDADE == "" {
-                        if subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO == ""{
-                            if subset.NOME-DA-AREA-DO-CONHECIMENTO == "" {
-                                let area = subset.NOME-GRANDE-AREA-DO-CONHECIMENTO
-                                let partes = area.split("_")
-                                let novas = ()
-                                for entry in partes {
-                                    entry = upper(entry.slice(0, 1)) + lower(entry.slice(1))
-                                    entry = entry.replace("Ciencia", "Ciência")                                
-                                    novas.push(entry)
-                                }
-                                area = novas.join(" ")
-                                conhecimento.push(area)
-                            } else {
-                                conhecimento.push(subset.NOME-DA-AREA-DO-CONHECIMENTO)
-                            }
-                        } else {
-                            conhecimento.push(subset.NOME-DA-SUB-AREA-DO-CONHECIMENTO)
-                        }
-                    } else {
-                        conhecimento.push(subset.NOME-DA-ESPECIALIDADE)
-                    }
-                }
-            }
-
-            // criando string de áreas de conhecimento
-            if conhecimento.len() > 0 {
-                conhecimento = conhecimento.join(", ")
-            }
-
-            // criando o link, prefire DOI 
-            let doi_link = []
-            if doi.len() > 0 {
-                doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
-            }
-            
-            // criando local & editora
-            let local_editora_content = []
-            if local != "" and editora != "" {
-                local_editora_content = [#local: #editora,] 
-            } else if local != "" and editora == "" {
-                local_editora_content = [#local,]
-            } else if local == "" and editora != "" {
-                if editora_local == "" {
-                    local_editora_content = [#editora,]
-                } else {
-                    local_editora_content = [#editora_local: #editora,]
-                }                
-            } else {
-                local_editora_content = []
-            }
-
-            // criando citação
-            let citacao = [#autores #text(titulo, weight: "semibold"). In: #evento_nome, #ano, #local_editora_content #emph(titulo_anais). #doi_link #linebreak()]
-
-            // criando content palavras-chave
-            let palavras_content = []
-            if palavras_chave.len() > 0 {
-                palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-            } 
-
-            // criando content para áreas de conhecimento
-            let areas_content = [] 
-            if conhecimento.len() > 0 {
-                areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento) #linebreak()]
-            }
-
-            // criando conteúdo 
-            let descricao_content = []
-            if tipo_lattes == "completo" {
-                descricao_content = [#citacao #palavras_content #areas_content]
-            } else {
-                descricao_content = [#citacao]
-            }
-            // publicando content
-            create-cols([*#i*], [#descricao_content], "enum")
-
-            // diminuir número para ordem
-            i -= 1
-        }   
+        create-abstracts-area(dados_expandidos, eu, tipo_lattes)
+        
     }
 }
+
 // Função create-bibliography: Cria área de Produções: Artigos publicados, livros publicados, capítulos publicados e demais técnicos
 // Argumentos:
 //  - detalhes: o banco de dados com todas as informações (arquivo TOML)
@@ -1520,7 +1282,6 @@
         
             // Relatórios de pesquisa
             // checando que tem ou não tem
-            // TODO: single case array
             if "RELATORIO-DE-PESQUISA" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
                 if type(subset.RELATORIO-DE-PESQUISA) == array {
                     let relatorio = subset.RELATORIO-DE-PESQUISA
@@ -1540,9 +1301,7 @@
             }
             
             // cursos curtos
-            // checando que tem ou não tem
-            // TODO: single case array
-            
+            // checando que tem ou não tem            
             if "CURSO-DE-CURTA-DURACAO-MINISTRADO" in detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.keys() {
                 if type(subset.CURSO-DE-CURTA-DURACAO-MINISTRADO) == array {
                     let cursos_curtos = detalhes.PRODUCAO-TECNICA.DEMAIS-TIPOS-DE-PRODUCAO-TECNICA.CURSO-DE-CURTA-DURACAO-MINISTRADO
