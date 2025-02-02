@@ -611,7 +611,10 @@
 
     for entrada in dados_livros {
         if type(entrada) == array {
-     
+            
+            entrada = entrada.sorted(
+                key: (item) => (item.DADOS-BASICOS-DO-LIVRO.ANO, item.DADOS-BASICOS-DO-LIVRO.TITULO-DO-LIVRO)
+            )
             
 
             let i = entrada.len()
