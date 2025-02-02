@@ -603,113 +603,117 @@
 
     for entrada in dados_livros.rev() {
         if type(entrada) == array {
-            // criando subset 
-            let subset = entrada.at(0)
-            // criando variáveis
-            let palavras_chave= ()
-            let conhecimento = ()
+            
+            let i = entrada.len()
+            // loop para entradas
+            for book in entrada.rev() {
+                // criando variáveis
+                let palavras_chave= ()
+                let conhecimento = ()
 
-            // autores: 
-            let autores = []
-            if type(subset.AUTORES) == dictionary {
-                autores = format-authors(subset.AUTORES, eu)    
-            } else if type(subset.AUTORES) == array {
-                autores = format-authors(subset.at("AUTORES"), eu)
-            }
-            
-            
-            let titulo = subset.DADOS-BASICOS-DO-LIVRO.TITULO-DO-LIVRO
-            let ano = subset.DADOS-BASICOS-DO-LIVRO.ANO
-            let doi = subset.DADOS-BASICOS-DO-LIVRO.DOI
-            let editora = subset.DETALHAMENTO-DO-LIVRO.NOME-DA-EDITORA
-            let local = subset.DETALHAMENTO-DO-LIVRO.CIDADE-DA-EDITORA
-            
-            let pagina = []
-            if subset.DETALHAMENTO-DO-LIVRO.NUMERO-DE-PAGINAS != "" {
-                pagina = [#subset.DETALHAMENTO-DO-LIVRO.NUMERO-DE-PAGINAS]
-            }
+                // autores: 
+                let autores = []
+                if type(book.AUTORES) == dictionary {
+                    autores = format-authors(book.AUTORES, eu)    
+                } else if type(book.AUTORES) == array {
+                    autores = format-authors(book.at("AUTORES"), eu)
+                }
+                
+                
+                let titulo = book.DADOS-BASICOS-DO-LIVRO.TITULO-DO-LIVRO
+                let ano = book.DADOS-BASICOS-DO-LIVRO.ANO
+                let doi = book.DADOS-BASICOS-DO-LIVRO.DOI
+                let editora = book.DETALHAMENTO-DO-LIVRO.NOME-DA-EDITORA
+                let local = book.DETALHAMENTO-DO-LIVRO.CIDADE-DA-EDITORA
+                
+                let pagina = []
+                if book.DETALHAMENTO-DO-LIVRO.NUMERO-DE-PAGINAS != "" {
+                    pagina = [#book.DETALHAMENTO-DO-LIVRO.NUMERO-DE-PAGINAS]
+                }
 
-            // Palavras-chave
-            if "PALAVRAS-CHAVE" in subset.keys() {
-                for palavra in subset.PALAVRAS-CHAVE.keys() {
-                    if subset.PALAVRAS-CHAVE.at(palavra) != "" {
-                        palavras_chave.push(subset.PALAVRAS-CHAVE.at(palavra))    
+                // Palavras-chave
+                if "PALAVRAS-CHAVE" in book.keys() {
+                    for palavra in book.PALAVRAS-CHAVE.keys() {
+                        if book.PALAVRAS-CHAVE.at(palavra) != "" {
+                            palavras_chave.push(book.PALAVRAS-CHAVE.at(palavra))    
+                        }
                     }
                 }
-            }
 
-            // criando string de palavras-chave
-            if palavras_chave.len() > 0 {
-                palavras_chave = palavras_chave.join("; ") + ";"
-            }
-
-            // areas de conhecimento
-            if "AREAS-DO-CONHECIMENTO" in subset.keys() {
-                for entrada in subset.AREAS-DO-CONHECIMENTO.keys() {
-                    let subset2 = subset.AREAS-DO-CONHECIMENTO.at(entrada)
-                    
-                    for valor in subset2.keys() {
-                        let area = subset2.at(valor)
-
-                        // Define a function to capitalize the first letter of a substring
-                        // let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
-
-                        if area != "" {
-                            let area_parts = area.split("_")
-
-                            area = area_parts.map(capitalize).join(" ")
-
-                            conhecimento.push(area)
-                        }
-                    }                
+                // criando string de palavras-chave
+                if palavras_chave.len() > 0 {
+                    palavras_chave = palavras_chave.join("; ") + ";"
                 }
+
+                // areas de conhecimento
+                if "AREAS-DO-CONHECIMENTO" in book.keys() {
+                    for entrada in book.AREAS-DO-CONHECIMENTO.keys() {
+                        let subset = book.AREAS-DO-CONHECIMENTO.at(entrada)
+                        
+                        for valor in subset.keys() {
+                            let area = subset.at(valor)
+
+                            // Define a function to capitalize the first letter of a substring
+                            // let capitalize = (text) => str(text.slice(0, 1) + lower(text.slice(1)))
+
+                            if area != "" {
+                                let area_parts = area.split("_")
+
+                                area = area_parts.map(capitalize).join(" ")
+
+                                conhecimento.push(area)
+                            }
+                        }                
+                    }
+                }
+
+                // criando citação
+                // criando link (prefire DOI)
+                let doi_link = []
+                if doi.len() > 0 {
+                    doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
+                }
+                
+                // criando local & editora
+                let local_editora_content = []
+                if local != "" and editora != "" {
+                    local_editora_content = [#local: #editora,] 
+                } else if local != "" and editora == "" {
+                    local_editora_content = [#local,]
+                } else if local == "" and editora != "" {
+                    local_editora_content = [#editora,]
+                } 
+
+                // criando citacao
+                let citacao = [#autores #text(titulo, weight: "semibold"). #local_editora_content #ano, p. #pagina. #doi_link #linebreak()]
+
+                // criando content palavras-chave
+                let palavras_content = []
+                if palavras_chave.len() > 0 {
+                    palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
+                } 
+
+                // criando content para área
+                let areas_content = [] 
+                if conhecimento.len() > 0 {
+                    areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento.join(", "))]
+                } 
+
+                // criando descricao
+                let descricao_content = []
+                if tipo_lattes == "completo" {
+                    descricao_content = [#citacao #palavras_content #areas_content]
+                } else {
+                    descricao_content = [#citacao]
+                }        
+                
+                // publicando content
+                create-cols([*#i*], [#descricao_content], "enum")
+                
+                // diminuir número
+                i -= 1
             }
-
-            // criando citação
-            // criando link (prefire DOI)
-            let doi_link = []
-            if doi.len() > 0 {
-                doi_link = [#link("https://doi.org/"+ doi)[DOI: #doi]]
-            }
             
-            // criando local & editora
-            let local_editora_content = []
-            if local != "" and editora != "" {
-                local_editora_content = [#local: #editora,] 
-            } else if local != "" and editora == "" {
-                local_editora_content = [#local,]
-            } else if local == "" and editora != "" {
-                local_editora_content = [#editora,]
-            } 
-
-            // criando citacao
-            let citacao = [#autores #text(titulo, weight: "semibold"). #local_editora_content #ano, p. #pagina. #doi_link #linebreak()]
-
-            // criando content palavras-chave
-            let palavras_content = []
-            if palavras_chave.len() > 0 {
-                palavras_content = [#text(rgb("B2B2B2"), size: 0.85em, "Palavras-chave: "+ palavras_chave) #linebreak()]
-            } 
-
-            // criando content para área
-            let areas_content = [] 
-            if conhecimento.len() > 0 {
-                areas_content = [#text(rgb("B2B2B2"), size: 0.85em, "Áreas de conhecimento: "+ conhecimento.join(", "))]
-            } 
-
-            // criando descricao
-            let descricao_content = []
-            if tipo_lattes == "completo" {
-                descricao_content = [#citacao #palavras_content #areas_content]
-            } else {
-                descricao_content = [#citacao]
-            }        
-            
-            // publicando content
-            create-cols([*#i*], [#descricao_content], "enum")
-            
-            // diminuir número
-            i -= 1
         } else if type(entrada) == dictionary {
             // criando subset 
             let subset = entrada
