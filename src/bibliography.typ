@@ -310,7 +310,7 @@
 
             // criando áreas de conhecimento
             if "AREAS-DO-CONHECIMENTO" in subset.keys() {
-                let areas = entrada.at("AREAS-DO-CONHECIMENTO")
+                let areas = subset.at("AREAS-DO-CONHECIMENTO")
 
                 let i = 0
                 
@@ -426,7 +426,7 @@
 
             // diminuir número para ordem
             i -= 1
-        }  else if type(entrada) == dictionary {
+        } else if type(entrada) == dictionary {
             // initialize variables
             let palavras_chave = ()
             let conhecimento = ()
