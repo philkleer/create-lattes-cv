@@ -1,5 +1,5 @@
 #import "@preview/datify:0.1.3": *
-#import "src/import.typ": *
+#import "import.typ": *
 
 // Função lattes_cv: criar o PDF com os dados de lattes
 // Arguments:
@@ -10,7 +10,7 @@
 // - data: a data de currículo (datetime)
 // - subtitle: para a página inicial 
 #let lattes-cv(
-  database: "output.toml",
+  database: array,
   kind: "completo", 
   me: str,
   last_page: true,
@@ -19,7 +19,7 @@
   body,
 ) = {
     // define details:
-    let details = toml(database)
+    let details = database
 
     // define author
     let author = details.DADOS-GERAIS.NOME-COMPLETO
