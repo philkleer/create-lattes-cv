@@ -266,13 +266,14 @@
     // criando número para ordem
     let i = dados_capitulos.len()
 
-    for entrada in dados_capitulos {  
-        // sorting
-        entrada = entrada.sorted(
-            key: (item) => (item.DADOS-BASICOS-DO-CAPITULO.ANO, item.DADOS-BASICOS-DO-CAPITULO.TITULO-DO-CAPITULO-DO-LIVRO)
-        ).rev()
+    for entrada in dados_capitulos {        
 
         if type(entrada) == array {
+
+            // sorting
+            entrada = entrada.sorted(
+                key: (item) => (item.DADOS-BASICOS-DO-CAPITULO.ANO, item.DADOS-BASICOS-DO-CAPITULO.TITULO-DO-CAPITULO-DO-LIVRO)
+            ).rev()
             
             let i = entrada.len()
 
