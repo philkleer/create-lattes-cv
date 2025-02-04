@@ -33,12 +33,12 @@
                 let doutorado = andamento.ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO
                 
                 // ordenar por ano (descendo)
-                let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO))
+                let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.ANO))
 
                 // criando Orientador
                 // filtrar para funcção (aqui: orientador)
                 let doutorado_filtro = doutorado_ordem.filter(
-                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
+                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
                 )
 
                 // criando conteúdo somente se tiver uma entrada
@@ -50,12 +50,12 @@
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
                         // criando varíaveis
-                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
-                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
-                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
-                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NATUREZA
-                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
-                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
+                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DO-ORIENTADO
+                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.TITULO
+                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.ANO
+                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NATUREZA
+                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DO-CURSO
+                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DA-INSTITUICAO
 
                         // criando entrada final
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
@@ -70,7 +70,7 @@
                 // criando co-orientador
                 // filtrar para funcção (aqui: orientador)
                 let doutorado_filtro = doutorado_ordem.filter(
-                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
+                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
                 )
 
                 // criando conteúdo somente se tiver uma entrada
@@ -82,12 +82,12 @@
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
                         // criando varíaveis
-                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-ORIENTADO
-                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.TITULO
-                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.ANO
-                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NATUREZA
-                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DO-CURSO
-                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-MESTRADO.NOME-DA-INSTITUICAO
+                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DO-ORIENTADO
+                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.TITULO
+                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.ANO
+                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NATUREZA
+                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DO-CURSO
+                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-EM-ANDAMENTO-PARA-DOUTORADO.NOME-DA-INSTITUICAO
 
                         // criando entrada final
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
@@ -239,11 +239,11 @@
                 // criando banco de dados para tipo
                 let doutorado = concluidos.ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO
                 
-                let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO))
+                let doutorado_ordem = doutorado.sorted(key: (item) => (item.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.ANO))
 
                 // Caso doutorado: Orientador
                 let doutorado_filtro = doutorado_ordem.filter(
-                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
+                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.TIPO-DE-ORIENTACAO == "ORIENTADOR"
                 )
                 
                 if doutorado_filtro.len() > 0 {
@@ -252,12 +252,12 @@
 
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
-                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-ORIENTADO
-                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TITULO
-                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO
-                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NATUREZA
-                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
-                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
+                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DO-ORIENTADO
+                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.TITULO
+                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.ANO
+                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NATUREZA
+                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DO-CURSO
+                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DA-INSTITUICAO
 
                         // criando conteúdo
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
@@ -272,7 +272,7 @@
 
                 // Caso doutorado: Co-orientador
                 let doutorado_filtro = doutorado_ordem.filter(
-                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
+                    entry => entry.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.TIPO-DE-ORIENTACAO == "CO_ORIENTADOR"
                 )
                 
                 if doutorado_filtro.len() > 0 {
@@ -281,12 +281,12 @@
 
                     let i = doutorado_filtro.len()
                     for entrada in doutorado_filtro.rev() {
-                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-ORIENTADO
-                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.TITULO
-                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.ANO
-                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NATUREZA
-                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DO-CURSO
-                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-MESTRADO.NOME-DA-INSTITUICAO
+                        let orientando = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DO-ORIENTADO
+                        let titulo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.TITULO
+                        let ano = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.ANO
+                        let tipo = entrada.DADOS-BASICOS-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NATUREZA
+                        let programa = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DO-CURSO
+                        let universidade = entrada.DETALHAMENTO-DE-ORIENTACOES-CONCLUIDAS-PARA-DOUTORADO.NOME-DA-INSTITUICAO
 
                         // criando conteúdo
                         descricao_content = [#orientando. #text(weight: "semibold", titulo). #ano. #tipo (#programa) - #universidade]
