@@ -254,8 +254,10 @@
                 tempo_content = [#dados-comissoes.MES-INICIO/#posdados-comissoescao.ANO-INICIO - #dados-comissoes.MES-FIM/#dados-comissoes.ANO-FIM]
             }
             
+            let informacao = replace-quotes(dados-comissoes.ESPECIFICACAO)
+
             descricao_content = [
-                #dados-comissoes.ESPECIFICACAO, #emph(dados-comissoes.NOME-ORGAO)
+                informacao, #emph(dados-comissoes.NOME-ORGAO)
             ]
             
             // publicando content
